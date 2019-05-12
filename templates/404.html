@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load mytags %}
+{% block site_title %} 未找到页面～～ &nbsp;| {{ siteinfo.site_name }} {% endblock %}
+
+
+{% block article %}
+<article class="article-main">
+
+<div class="blog-content">
+
+<style>
+
+.ifr-404 {
+    width: 100%;
+    margin: 60px 0 108px;
+    text-align: center
+}
+
+.ifr-404 .ifr-desk-404 {
+    font-family: PingFangSC-Medium,"Microsoft Yahei-Bold","Microsoft Yahei";
+    text-align: center
+}
+
+.ifr-404 .ifr-desk-404 .ifr-desk-content {
+    display: inline-block;
+    width: 400px;
+    height: 400px;
+
+    background: url({%  static 'images/empty-page_bg.png' %} ) no-repeat;
+    background-size: cover
+}
+
+.ifr-404 .ifr-desk-404 .ifr-404-title {
+    font-size: 24px;
+    color: #a8a8a8
+}
+
+.ifr-404 .ifr-desk-404 .ifr-404-subtitle {
+    margin-top: 8px;
+    font-size: 16px;
+    color: #a8a8a8
+}
+
+.ifr-404 .ifr-desk-404 .ifr-404-des {
+    margin-top: 24px;
+    font-size: 16px;
+    color: #dadada
+}
+
+</style>
+
+<div class="main ifr-404">
+      <div class="ifr-desk-404">
+        <div class="ifr-desk-content"></div>
+        <div class="ifr-404-title">出错了，着陆失败</div>
+        <div class="ifr-404-subtitle">Oops, It seems that you’ve landed on the wrong planet.</div>
+        <div class="ifr-404-des">错误代码：404</div>
+      </div>
+</div>
+
+
+</div>
+
+
+</article>
+
+
+{% endblock %}
+
+
+{% block js %}
+
+
+    <!-- jQuery -->
+<script src="{%  static 'amazeui/assets/js/jquery.min.js' %}" type="text/javascript"></script>
+<script>
+    $.get("https://openapi.link/api/weather/json", null, function(t) {
+        "" == t ? $(".weather-city").text("暂无数据") : ($(".weather-t1").text(t.data[0].now.tmp), $(".weather-t2").text(t.data[0].now.hum), $(".weather-city").text(t.data[0].basic.location +"/"+ t.data[0].now.cond_txt+"/"+t.data[0].now.wind_dir));
+        console.log(t)
+    }, "JSON");
+</script>
+
+{% endblock %}
+
+

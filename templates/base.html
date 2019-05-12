@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html>
+{% load staticfiles %}
+{% load mytags %}
+<head lang="en">
+    <meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />    
+<title>{% block site_title %}{% endblock site_title %}</title>
+    <link rel="shortcut icon" href="{{ MEDIA_URL }}{{ siteinfo.site_logo }}">
+    <meta name="keywords" content="Python,Django,go,Java,sql,linux,javascript,jquery,git,教程,软件,编程,开发,运维,云计算,网络,互联网">
+    <meta name="description" content="www.mongona.com ,为 IT 开发者提供了一个发现、使用、并交流开源技术的平台。">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!-- amazeui -->
+    <link href="{% static 'amazeui/assets/css/amazeui.min.css' %}" rel="stylesheet">
+    <!-- 当前站点CSS样式文件 -->
+    <link href="{% static 'main.css' %}" rel="stylesheet">
+    <!--music-->
+    <link rel="stylesheet" href="https://cdn.mongona.com/static/APlayer.min.css">
+    {% block css %}{% endblock css %}
+{#    <link rel="stylesheet" href="http://127.0.0.1:9870/APlayer.min.css">#}
+    <!-- jQuery -->
+    <script src="{%  static 'amazeui/assets/js/jquery.min.js' %}" type="text/javascript"></script>
+    <!-- amazeui.js app.js -->
+    <script src="{%  static 'amazeui/assets/js/amazeui.min.js' %}" type="text/javascript"></script>
+    <!--每日一诗-->
+    <script src="https://sdk.jinrishici.com/v2/browser/jinrishici.js" charset="utf-8"></script>
+    <!--Google adsense-->
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<script>
+  (adsbygoogle = window.adsbygoogle || []).push({
+    google_ad_client: "ca-pub-3591836137242221",
+    enable_page_level_ads: true
+  });
+</script>
+    <style>
+    body {
+            font-family: "SF Pro SC","SF Pro Text","SF Pro Icons","PingFang SC","Helvetica Neue","Helvetica","Arial",sans-serif;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+
+        }
+
+.header-weather {
+color: #fff;
+position: absolute;
+top: 53px;
+right: 10px;
+text-align: center;
+background-color: gray;
+border-radius: 6px;
+}
+.weather-t1:after, .weather-t2:after {
+    position: absolute;
+    content: "°";
+}
+.weather-t1 {
+    font-size: 16px;
+}
+.weather-t2 {
+    margin-left: 2px;
+    font-size: 10px;
+}
+.weather-t2:after {
+    top: 8px;
+}
+.weather-city {
+    font-size: 12px;
+}
+</style>
+
+</head>
+<body>
+<header class="am-topbar am-topbar-fixed-top">
+    <div class="am-g am-g-fixed blog-g-fixed">
+        <h1 class="am-topbar-brand am-center">
+            <a href="{% url '' %}" style="font-size:2.8rem">mongona</a>
+        </h1>
+        <button class="am-topbar-btn am-topbar-toggle am-btn am-btn-sm am-btn-primary am-show-sm-only"
+                data-am-collapse="{target: '#doc-topbar-collapse'}">
+		<span  class="am-icon-bars"></span></button>
+
+        <div class="am-collapse am-topbar-collapse" id="doc-topbar-collapse">
+            <ul class="am-nav am-nav-pills am-topbar-nav">
+                <li class="{% if page_url == '/' %}am-active{% endif %}"><a href="{% url '' %}">Home</a></li>
+                <li class="{% if page_url == '/?c=1' %}am-active{% endif %}"><a href="{% url '' %}?c=1">Python</a></li>
+                <li class="{% if page_url == '/?c=2' %}am-active{% endif %}"><a href="{% url '' %}?c=2">Go</a></li>
+                <li class="{% if page_url == '/?c=3' %}am-active{% endif %}"><a href="{% url '' %}?c=3">Operation</a></li>
+                <li class="{% if page_url == '/?c=4' %}am-active{% endif %}"><a href="{% url '' %}?c=4">Gallery</a></li>
+                <li class="{% if page_url == '/?c=5' %}am-active{% endif %}"><a href="{% url '' %}?c=5">Life</a></li>
+                <li class="{% if page_url == '/?c=6' %}am-active{% endif %}"><a href="{% url '' %}?c=6">About</a>
+                </li>
+
+            </ul>
+            <form class="am-topbar-form am-topbar-left am-form-inline am-topbar-right" action="{% url '' %}">
+
+                <div class="am-form-group">
+                    <input type="text" class="am-form-field am-input-sm bosiinput" placeholder="search you" name="s">
+                </div>
+                <button type="submit" class="am-btn am-btn-primary am-btn-sm">
+                    <i class="am-icon-search"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</header>
+
+<div class="site-topimg am-g">
+
+    <img src="{{ MEDIA_URL }}{{ siteinfo.site_topimage }}" class="am-img-responsive am-center" alt="mongona"/>
+</div>
+
+
+<a href="https://openapi.link/#/weather", target="_blank">
+    <div class="header-weather">
+    <span class="weather-t1">--</span>
+    <span class="weather-t2">--</span>
+    <div class="weather-city">正在获取天气</div>
+</div>
+</a>
+
+
+<div class="am-g am-g-fixed blog-g-fixed">
+    <div class="am-u-md-8">
+        {% block article %}
+            article-content
+        {% endblock article %}
+
+    </div>
+
+    <div class="am-u-md-4 blog-sidebar">
+        <div class="am-panel-group">
+
+
+            <section class="am-panel am-panel-default">
+                <div class="am-panel-hd">About</div>
+
+                <div class="am-panel-bd">
+                    <div class="avatar">
+                        <img class="am-circle am-center" src="{{ MEDIA_URL }}{{ userinfo.user_image }}" width="140"
+                             height="140"/>
+                    </div>
+                    <div class="am-text-center am-text-lg nick-name">{{ userinfo.user_nick_name }}</div>
+
+
+                    <div class="am-text-center am-text-xs ">{{ userinfo.user_detail }}</div>
+                </div>
+            </section>
+
+
+            <!-- 文章分类 -->
+            <section class="am-panel am-panel-default blog-cat">
+                <div class="am-panel-hd">Category</div>
+                <ul class="am-list am-list-border">
+                    {% for c in categorys %}
+
+                        <li>
+                            <a class="am-link-muted" href="{% url '' %}?c={{ c.id }}" title="{{ c.category_detail }}">
+                                <i class="{{ c.category_icon }}"></i>
+                                {{ c.category_name }}
+                                <!-- 统计分类下文章数 -->
+                                <span class="am-badge am-align-right">{{ c.id | cat_count }}</span>
+                            </a>
+
+                        </li>
+
+                    {% endfor %}
+
+
+                </ul>
+            </section>
+
+            <!-- 标签云 -->
+            <section class="am-panel am-panel-default">
+                <div class="am-panel-hd">Tags</div>
+                <div class="am-panel-bd">
+                    {% for tag in alltags %}
+                        <a href="{% url '' %}?t={{ tag }}" class="am-badge {{ tagcss | random }}">{{ tag }}</a>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <!-- 站点资料统计 -->
+            <section class="am-panel am-panel-default">
+                <div class="am-panel-hd">Site statistics</div>
+                <div class="am-panel-bd">
+                    <p id="jinrishici-sentence" class="am-link-muted" style="text-align: center;">正在加载今日诗词....</p>
+                    <p>本站现有文章<span class="am-text-secondary">{{ ac_count }}</span>篇,共被浏览<span class="am-text-primary">{{ ac_click }}</span>次</p>
+                    <p>本次响应耗时:&nbsp;<span class="am-text-primary"><!!LOAD_TIMES!!>s</span></p>
+                    <p>当前来路IP:&nbsp;<span class="am-text-primary"><!!ip!!>&nbsp;&nbsp;<!!addr!!></span></p>
+                    <p>您是本站第:&nbsp;<span class="am-text-primary"><!!visitor!!></span>&nbsp;位访客!</p>
+                    <p>本站已苟活:&nbsp;<span id="run_time" class="am-text-primary"></span></p>
+                </div>
+            </section>
+
+            <!-- 热门文章  -->
+            <section class="am-panel am-panel-default blog-cat">
+                <div class="am-panel-hd">All hots</div>
+                <ul class="am-list am-list-border">
+
+                    {% for hac in hot_articles %}
+
+                        <li>
+                            <a class="am-link-muted am-text-truncate" href="{% url '' %}blog/{{ hac.id }}">
+
+                                {{ hac.article_title }}
+
+                            </a>
+
+                        </li>
+                    {% endfor %}
+
+                </ul>
+            </section>
+
+            <!-- 文章归档  -->
+            <section class="am-panel am-panel-default blog-cat">
+                <div class="am-panel-hd">Article archiving
+                </div>
+                <ul class="am-list am-list-border am-list-striped">
+
+                    {% for date in dates %}
+
+                        <li>
+                            <a class="am-link-muted" href="{% url '' %}?d={{ date.year }}-{{ date.month }}">
+
+                                {{ date.year }}年{{ date.month }}月
+
+                            </a>
+
+                        </li>
+                    {% endfor %}
+
+                </ul>
+            </section>
+
+
+        </div>
+    </div>
+
+</div>
+
+<div class="footer-top">
+    <div class="am-g blog-g-fixed">
+        <div class="am-u-md-3">
+            <h2 class="site-fd am-text-center"><a href="javascript:void(0);" target="_blank" class="am-link-muted">Powered By</a></h2>
+            <ul class="site-links">
+                {% autoescape off %}
+                    {{ siteinfo.site_powered }}
+                {% endautoescape %}
+            </ul>
+        </div>
+        <div class="am-u-md-3">
+            <h2 class="site-fd am-text-center"><a href="javascript:void(0);" target="_blank" class="am-link-muted">Links</a></h2>
+            <ul class="site-social">
+                {% autoescape off %}
+                    {{ siteinfo.site_links }}
+                {% endautoescape %}
+
+            </ul>
+        </div>
+        <div class="am-u-md-6">
+            <h2 class="site-fd am-text-center"><a href="javascript:void(0);" target="_blank" class="am-link-muted">Contact me</a></h2>
+            {% autoescape off %}
+                {{ siteinfo.site_contact }}
+            {% endautoescape %}
+
+        </div>
+
+    </div>
+</div>
+<footer class="blog-footer am-g">
+    {% autoescape off %}
+        {{ siteinfo.site_footer }}
+    {% endautoescape %}
+</footer>
+
+<div data-am-widget="gotop" class="am-gotop am-gotop-fixed">
+    <a href="#top" title="飞回顶部">
+        <i class="am-gotop-icon am-icon-chevron-up"></i>
+    </a>
+</div>
+<div id="particles-js"></div>
+<!-- 粒子特效 -->
+<script src="{% static 'particles/particles.js'  %}"></script>
+<script src="{% static 'particles/app.js'  %}"></script>
+{% block js %}
+{% endblock %}
+<script>
+function runTime(){
+            var d = new Date(), str = '';
+            BirthDay=new Date("December 10,2018");
+            today=new Date();
+            timeold=(today.getTime()-BirthDay.getTime());
+            sectimeold=timeold/1000;
+            secondsold=Math.floor(sectimeold);
+            msPerDay=24*60*60*1000;
+            msPerYear=365*24*60*60*1000;
+            e_daysold=timeold/msPerDay;
+            e_yearsold=timeold/msPerYear;
+            daysold=Math.floor(e_daysold);
+            yearsold=Math.floor(e_yearsold);
+            str = daysold+"天";
+            str += d.getHours()+'时';
+            str += d.getMinutes()+'分';
+            str += d.getSeconds()+'秒';
+            return str;
+            }
+setInterval(function(){$('#run_time').html(runTime())},1000);
+
+$.get("https://openapi.link/api/weather/json", null, function(t) {
+    if (t){
+        console.log(t.data[0]);
+        "" === t ? $(".weather-city").text("暂无数据") : ($(".weather-t1").text(t.data[0].now.tmp), $(".weather-t2").text(t.data[0].now.hum), $(".weather-city").text(t.data[0].basic.location +"/"+ t.data[0].now.cond_txt+"/"+t.data[0].now.wind_dir));
+    }else {
+        (".weather-city").text("暂无数据");
+    }
+    }, "JSON");
+
+</script>
+</body>
+</html>

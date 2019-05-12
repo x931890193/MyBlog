@@ -1,0 +1,265 @@
+/* body{font-family: 'country_gothic', Arial, Helvetica, Simsun, STHeiti;} */
+@media only screen and (min-width: 1200px) {
+    .blog-g-fixed {
+        max-width: 1200px;
+    }
+}
+
+@media only screen and (min-width: 641px) {
+    .blog-sidebar {
+        font-size: 1.4rem;
+    }
+}
+
+.blog-main {
+    padding: 0;
+}
+
+.blog-title {
+    margin: 10px 0 20px 0;
+}
+
+.blog-meta {
+    font-size: 14px;
+    margin: 10px 0 20px 0;
+    color: #575757;
+}
+
+.blog-pagination a {
+    font-size: 1.4rem;
+}
+
+.blog-team li {
+    padding: 4px;
+}
+
+.blog-team img {
+    margin-bottom: 0;
+}
+
+.blog-content img,
+.blog-team img {
+    max-width: 100%;
+    height: auto;
+}
+
+
+.blog-footer {
+    padding: 10px 0;
+    text-align: center;
+    background: #333;
+    color: #ccc;
+}
+
+.footer-top {
+    background-color: #f8f8f8;
+}
+
+.site-links li,
+.site-social li {
+    display: inline-block;
+    padding-right: 5px;
+    padding-left: 5px;
+}
+
+
+.blog-title {
+    margin: 10px 0 20px 0;
+}
+
+.blog-title a {
+    font-size: 26px;
+}
+
+
+/* 导航文字颜色 */
+.am-topbar a {
+    color: #ccc;
+}
+
+.am-topbar a:hover {
+    color: #fff;
+}
+
+/* 首页导航下边距离   */
+.am-topbar {
+    margin-bottom: 0px;
+    background: #26272b;
+    border-width: 0 0 1px;
+    border-style: solid;
+    border-color: #26272b;
+    color: #fff;
+}
+
+/* top图下边距  */
+.site-topimg {
+    margin-bottom: 10px;
+}
+
+/* 搜索框颜色 */
+.bosiinput {
+    background: #26272b;
+    color: #666;
+    border-color: #333;
+}
+
+
+/* 去导航背景 */
+.am-topbar-nav > li > a:hover {
+    background: none;
+    color: #fff;
+}
+
+/* 去导航下边小三角 */
+.am-topbar-nav > li > a:after {
+    display: none;
+}
+
+/* 选中的导航文字hover 颜色 */
+.am-topbar-nav > li.am-active > a, .am-topbar-nav > li.am-active > a:focus, .am-topbar-nav > li.am-active > a:hover {
+    color: #F37B1D;
+    background: none;
+}
+
+
+.nick-name {
+    padding: 10px 0px;
+}
+
+
+/* 右边分类列表模块设置 */
+.blog-cat {
+    border: none;
+}
+
+.blog-cat .am-panel-hd {
+    border: 1px solid #ddd;
+    border-bottom: none;
+}
+
+/* 上一篇 下一篇 */
+.blog-pn {
+    height: auto;
+    overflow: hidden;
+}
+
+.blog-pn .am-panel-bd {
+    height: auto;
+    overflow: hidden;
+
+}
+
+
+canvas {
+    display: block;
+    vertical-align: bottom;
+}
+
+/* ---- particles.js container ---- */
+
+#particles-js {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #fff;
+    background-image: url("");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: 50% 50%;
+    z-index: -1;
+    top: 0;
+}
+
+/* ---- stats.js ---- */
+
+.count-particles {
+    background: #000022;
+    position: absolute;
+    top: 48px;
+    left: 0;
+    width: 80px;
+    color: #13E8E9;
+    font-size: .8em;
+    text-align: left;
+    text-indent: 4px;
+    line-height: 14px;
+    padding-bottom: 2px;
+    font-family: Helvetica, Arial, sans-serif;
+    font-weight: bold;
+}
+
+.js-count-particles {
+    font-size: 1.1em;
+}
+
+#stats,
+.count-particles {
+    -webkit-user-select: none;
+}
+
+#stats {
+    border-radius: 3px 3px 0 0;
+    overflow: hidden;
+}
+
+.count-particles {
+    border-radius: 0 0 3px 3px;
+}
+
+#container {
+    width: 100%;
+    margin: auto;
+}
+#container div {
+    -webkit-box-shadow: 0 4px 15px -5px #555;
+    box-shadow: 0 4px 15px -5px #555;
+    background-color: #fff;
+    width:220px;
+    padding:2px;
+    margin:5px;
+}
+#container > div img {
+    padding: 0px;
+    display: block;
+    width: 100%;
+}
+
+.article_info .title {
+    margin-bottom: 20px;
+}
+
+#div_digg {
+    font-size: 12px;
+    width: 125px;
+    text-align: center;
+    margin: auto;
+}
+
+/* 推荐 */
+.diggit {
+    float: left;
+    width: 46px;
+    height: 52px;
+    background: url('https://cdn.mongona.com/static/font/upup.gif') no-repeat;
+    text-align: center;
+    cursor: pointer;
+    margin-top: 2px;
+    padding-top: 5px;
+}
+
+/* 反对 */
+.buryit {
+    float: right;
+    margin-left: 20px;
+    width: 46px;
+    height: 52px;
+    background: url('https://cdn.mongona.com/static/font/downdown.gif') no-repeat;
+    text-align: center;
+    cursor: pointer;
+    margin-top: 2px;
+    padding-top: 5px;
+}
+
+.clear {
+    clear: both;  /* 清除浮动，解决塌陷问题 */
+}

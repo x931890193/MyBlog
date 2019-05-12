@@ -1,0 +1,277 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load mytags %}
+{% block site_title %}{{ article.article_title }} | {{ siteinfo.site_name }} {% endblock %}
+{% block css %}<link rel="stylesheet" href="https://cdn.mongona.com/static/css/style.css">{% endblock css %}
+{#{% block css %}<link rel="stylesheet" href="http://127.0.0.1:9870/style.css">{% endblock css %}#}
+
+{% block article %}
+        <article class="article-main">
+        <h4 class="am-article-title blog-title">
+            {% if article.article_original == '1' %}
+                <button type="button" class="am-btn am-btn-success am-round am-btn-xs" title="本文为作者原创">Origin</button>
+            {% endif %}
+            {% if article.article_original == '0' %}
+                <button type="button" class="am-btn am-btn-secondary am-round am-btn-xs" title="本文为转载文章">via</button>
+            {% endif %}
+
+            <a href="javascript:void(0);">{{ article.article_title }}</a>
+        </h4>
+        <h5 class="am-article-meta blog-meta">
+            Author：<a href="/?c=6" class="am-text-warning">{{ article.article_user.user_nick_name }}</a>&nbsp;
+            Publish：<span class="am-text-success"> {{ article.article_create_time }} </span>&nbsp;
+            Update：<span class="am-text-success"> {{ article.article_update_time }} </span>&nbsp;
+            Category：&nbsp;<a href="{% url '' %}?c={{ article.article_category.id }}" class="am-text-secondary">{{ article.article_category }}</a>&nbsp;
+            Reading：<span class="am-text-success">{{ article.article_click }}  </span>
+        </h5>
+
+        <div class="blog-content">
+       {% if article.article_image %}
+         <div align="center"><img alt="{{ article.article_title }}" src="{{ MEDIA_URL}}{{ article.article_image }}?imageView2/0/q/75|watermark/2/text/bW9uZ29uYS5jb20=/font/5b6u6L2v6ZuF6buR/fontsize/280/fill/IzAwMDAwMA==/dissolve/100/gravity/SouthEast/dx/10/dy/10|imageslim"></div>
+       {% endif %}
+
+            {% autoescape off %}
+
+            {{ article.article_content  }}
+                {{ siteinfo.site_changyan }}
+            {% endautoescape %}
+
+    <div id="div_digg">
+
+        <div class="diggit action">
+            <span class="diggnum" id="digg_count">{{ article.article_like }}</span>
+        </div>
+
+        <div class="buryit action">
+            <span class="diggnum" id="bury_count">{{ article.article_down }}</span>
+        </div>
+        <div class="clear"></div>
+        <div class="diggword" id="digg_tips" style="color: red;"></div>
+    </div>
+        {% csrf_token %}
+    <script>
+    $('#div_digg .action').click(function () {
+        var is_up = $(this).hasClass("diggit");
+        $obj = $(this).children("span");
+
+        $.ajax({
+            url: "/digg/like",
+            type: "post",
+            data: {
+                'csrfmiddlewaretoken': $("[name= 'csrfmiddlewaretoken']").val(),
+                "is_up": is_up,
+                "article_id": "{{ article.pk }}"
+            },
+            success: function (data) {
+                console.log(data);
+                if (data.state) {
+                    var val = parseInt($obj.text());  // parseInt() 函数可解析一个字符串，并返回一个整数。
+                    $obj.text(val+1);
+                } else {
+                    // 三元表达式
+                    var val = data.handled?"您已经推荐过！":"您已经反对过！";
+                    $("#digg_tips").html(val);
+
+                    setTimeout(function () {
+                        $("#digg_tips").html("")
+                    }, 1000)
+                }
+            }
+        })
+    });
+
+</script>
+        <div class="am-article-meta blog-meta">
+
+            <p class="am-text-sm am-text-center">Author：<a href="/?c=6" class="am-text-warning">{{ article.article_user.user_nick_name }}</a>
+                 Please give credit to the original author when you use it elsewhere：<a class="am-text-warning " href="/blog/{{ article.id }}">https://www.mongona.com/blog/{{ article.id }}</a></p>
+
+        </div>
+        <div class="am-panel blog-pn">
+            <div class="am-panel-bd">
+                <div class="am-u-sm-6">
+                    {% if pa %}
+                        <a type="button" class="am-btn am-btn-default am-btn-success am-center am-text-truncate"
+                           href="/blog/{{ pa.id }}">Pre Page
+                            <br>{{ pa.article_title }}
+                        </a>
+                    {% endif %}
+
+                </div>
+                <div class="am-u-sm-6">
+                    {% if na %}
+                        <a type="button" class="am-btn am-btn-default am-btn-success am-center am-text-truncate"
+                           href="/blog/{{ na.id }}">Next Page
+                            <br>{{ na.article_title }}
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% if tags %}
+            <div class="am-panel am-panel-default blog-tag">
+                <div class="am-panel-hd">Tags</div>
+                <div class="am-panel-bd">
+                    {% for tag in tags %}
+                        <a href="{% url '' %}?t={{ tag }}" class="am-badge am-badge-success">{{ tag }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+
+
+<div id="reward", class="page-modal reward-lay">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h5 class="reward-title">
+
+        富强，民主，文明，和谐，自由，平等，公正，法治，爱国，敬业，诚信，友善。
+
+    </h5>
+    <div class="reward-content">
+
+        <div class="reward-code">
+       <img id="rewardCode" src="https://cdn.mongona.com/static/images/wechat.jpg" alt="打赏二维码">
+        </div>
+
+        <label class="reward-toggle">
+            <input id="rewardToggle" type="checkbox" class="reward-toggle-check" data-wechat="https://cdn.mongona.com/static/images/wechat.jpg" data-alipay="https://cdn.mongona.com/static/images/alipay.jpg">
+            <div class="reward-toggle-ctrol">
+                <span class="reward-toggle-item wechat">微信</span>
+                <span class="reward-toggle-label"></span>
+                <span class="reward-toggle-item alipay">支付宝</span>
+            </div>
+        </label>
+
+    </div>
+</div>
+
+<div class="page-reward">
+    <a id="rewardBtn" href="javascript:;" class="page-reward-btn waves-effect waves-circle waves-light">赏</a>
+</div>
+
+<div class="post-footer">
+
+<div class="page-share-wrap">
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://www.mongona.com/blog/{{ article.id }}&amp;title={{ article.article_synopsis }}&amp;pic=https://cdn.mongona.com/upload/image/user/2019/03/170157_AOda_1767531.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://www.mongona.com/blog/{{ article.id }}&amp;title={{ article.article_synopsis}}| {{ siteinfo.site_name }}&amp;source=https://cdn.mongona.com/upload/image/user/2019/03/170157_AOda_1767531.jpg" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://www.mongona.com/blog/{{ article.id }}" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text={{ article.article_synopsis}} | {{ siteinfo.site_name}}&amp;url=https://www.mongona.com/blog/{{ article.id }}&amp;via=https://www.mongona.com" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://www.mongona.com/blog/{{ article.id }}" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+<a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+</div>
+
+
+
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<div id="gitalk-container"></div>
+<script>
+const gitalk = new Gitalk({
+  clientID: '24c4879d6eafc961651d',
+  clientSecret: 'df02f6e784706ab7fd34d1b245cdfbf15282be6c',
+  repo: 'gittalk',
+  owner: 'x931890193',
+  admin: ['x931890193'],
+  id: location.pathname,      // Ensure uniqueness and length less than 50
+  distractionFreeMode: false  // Facebook-like distraction free mode
+})
+gitalk.render('gitalk-container')
+</script>    
+
+
+</article>
+{% endblock %}
+
+
+{% block js %}
+<script>
+    var reward = $("#rewardBtn");
+    var rewarddiv = $("#reward");
+    var payToggle = $("#rewardToggle");
+    var payImage = $("#rewardCode");
+    var imgurl = payImage.attr("src");
+    var shareFabToggle = $("#shareFab");
+    var pageShare = $("#pageShare");
+    var pageShareAttr = pageShare.attr("class");
+    var close = $(".close");
+
+    reward.click(function f() {
+        rewarddiv.attr("class", "page-modal reward-lay ready in")
+    });
+
+    close.click(function f() {
+          rewarddiv.attr("class", "page-modal reward-lay")
+        });
+    payToggle.click(function () {
+        console.log(imgurl);
+        if (imgurl === "https://cdn.mongona.com/static/images/wechat.jpg"){
+            payImage.attr("src", "https://cdn.mongona.com/static/images/alipay.jpg");
+            imgurl = "https://cdn.mongona.com/static/images/alipay.jpg";
+
+        }else {
+
+            payImage.attr("src", "https://cdn.mongona.com/static/images/wechat.jpg");
+            imgurl = "https://cdn.mongona.com/static/images/wechat.jpg";
+        }
+    });
+    shareFabToggle.click(function () {
+        if (pageShareAttr === "page-share"){
+            pageShare.attr("class", "page-share in");
+            pageShareAttr = "page-share in";
+        }
+        else {
+            pageShare.attr("class", "page-share");
+            pageShareAttr = "page-share";
+        }
+
+
+    });
+
+
+
+
+
+
+</script>
+
+<link href="{% static 'highlight/styles/default.css' %}" rel="stylesheet">
+<script src="{%  static 'highlight/highlight.pack.js' %}"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+{% endblock %}
+
+

@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load mytags %}
+{% block site_title %}
+      {% if category_name %} {{ category_name }} &nbsp;| {% endif %}  {{ siteinfo.site_name }}
+{% endblock %}
+{% block article %}
+    {% if not contacts %}
+        <span class="am-text-success">There is nothing!</span>
+    {% endif %}
+    {% for article in contacts %}
+
+        <article class="blog-main">
+
+            <h3 class="am-article-title blog-title">
+                {% if article.article_original == '1' %}
+                    <button type="button" class="am-btn am-btn-success am-round am-btn-xs"
+                            alt="本文为{{ article.article_user.user_nick_name }}原创博文">Origin
+                    </button>
+                {% endif %}
+                {% if article.article_original == '0' %}
+                    <button type="button" class="am-btn am-btn-secondary am-round am-btn-xs" alt="本文为转载文章">via</button>
+                {% endif %}
+                <a href="/blog/{{ article.id }}">{{ article.article_title }}</a>
+            </h3>
+
+        <h4 class="am-article-meta blog-meta">
+            Author：<a href="/?c=6" class="am-text-warning">{{ article.article_user.user_nick_name }}</a>&nbsp;
+            Publish：<span class="am-text-success"> {{ article.article_create_time }} </span>&nbsp;
+            Update：<span class="am-text-success"> {{ article.article_update_time }} </span>&nbsp;
+            Category：&nbsp;<a href="{% url '' %}?c={{ article.article_category.id }}" class="am-text-secondary">{{ article.article_category }}</a>&nbsp;
+            Reading：<span class="am-text-success">{{ article.article_click }}  </span>
+        </h4>
+
+            <div class="blog-content" {% if article.article_image %} align="center"  {% endif %}>
+                <a href="/blog/{{ article.id }}" class="am-text-primary">
+                           {% if article.article_image %}
+         <P><img alt="{{ article.article_title }}" src="{{ MEDIA_URL}}{{ article.article_image }}?
+imageMogr2/auto-orient/thumbnail/!50p/blur/1x0/quality/100|watermark/2/text/bW9uZ29uYS5jb20=/font/5b6u6L2v6ZuF6buR/fontsize/240/fill/I0M4MTNFQg==/dissolve/100/gravity/SouthEast/dx/10/dy/10|imageslim"></P>
+       {% endif %}
+
+                {% autoescape off %}
+                    Abstract:&nbsp;&nbsp;{{ article.article_synopsis }}
+                {% endautoescape %}
+                </a>
+
+
+            </div>
+
+        <a href="/blog/{{ article.id }}" class="am-text-primary">Read More</a>
+         </article>
+        <hr class="am-article-divider blog-hr">
+
+    {% endfor %}
+
+    <!-- 翻页  -->
+    <div class="am-pagination am-pagination-centered">
+
+        {% if contacts.has_previous %}
+            <li class=""><a
+                    href="?{% if t != '' %}t={{ t }}&{% endif %}{% if d != '' %}d={{ d }}&{% endif %}{% if c != '' %}c={{ c }}&{% endif %}{% if s != '' %}s={{ s }}&{% endif %}p={{ contacts.previous_page_number }}">&laquo;
+                Pre page</a></li>
+        {% endif %}
+        {% if pages > 1 %}
+            {% for p in pages %}
+
+                <li class="{% if p == page_number %}am-active{% endif %}"><a
+                        href="?{% if t != '' %}t={{ t }}&{% endif %}{% if d != '' %}d={{ d }}&{% endif %}{% if c != '' %}c={{ c }}&{% endif %}{% if s != '' %}s={{ s }}&{% endif %}p={{ p }}">{{ p }}</a>
+                </li>
+            {% endfor %}
+            {% else %}
+
+        {% endif %}
+        {% if contacts.has_next %}
+            <li class=""><a
+                    href="?{% if t != '' %}t={{ t }}&{% endif %}{% if d != '' %}d={{ d }}&{% endif %}{% if c != '' %}c={{ c }}&{% endif %}{% if s != '' %}s={{ s }}&{% endif %}p={{ contacts.next_page_number }}">Next page
+                &raquo;</a></li>
+        {% endif %}
+
+    </div>
+
+{% endblock %}
+
+
+
+
+
+
+

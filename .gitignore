@@ -1,0 +1,83 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+.idea
+
+# C extensions
+*.so
+celerybeat-schedule
+
+#test
+test_result/
+
+# Distribution / packaging
+.Python
+.DS_Store
+Pipfile.lock
+myconfigs/
+.vscode/
+myconfigs/
+env/
+venv/
+bin/
+temp/
+.idea/
+build/
+develop-eggs/
+static/
+media/
+dist/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+log/
+kmeans/
+exercise/
+!newsphinx/sigma_stat/algorithm/exercise/
+scripts/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+*.lock
+*/temp/*
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.cache
+.db
+*.h5
+*.out
+nosetests.xml
+coverage.xml
+
+# Translations
+*.mo
+
+# Mr Developer
+.mr.developer.cfg
+.project
+.pydevproject
+*.sql
+
+# Rope
+.ropeproject
+
+# Django stuff:
+*.log
+*.pot
+*.swp
+
+# Sphinx documentation
+docs/_build/
+
+/darkforest/proxychains.conf
+/darkforest/darkforest/ENV_TAG

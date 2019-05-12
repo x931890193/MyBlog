@@ -1,0 +1,247 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load mytags %}
+{% block site_title %}{{ data.category_name }}&nbsp;| {{ siteinfo.site_name }} {% endblock %}
+
+
+{% block article %}<article class="article-main">
+
+<div class="blog-content">
+
+<style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "SF Pro SC","SF Pro Text","SF Pro Icons","PingFang SC","Helvetica Neue","Helvetica","Arial",sans-serif;
+
+        }
+        .container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            width: 100%;
+            flex-direction: column;
+            background-color: #fdfafa;
+        }
+        .card-container {
+            width:280px;
+            background: #FFF;
+        }
+        .album-container {
+            width: 320px;
+            height: 320px;
+            background-color: #fdfafa;
+        }
+        .album-img {
+            width: 320px;
+            height: 320px;
+            min-width: 100%;
+            min-height: 100%;
+            vertical-align: middle;
+            background: #808080;
+
+        }
+        .comment-container {
+            min-height: 120px;
+            background-color: #fdfafa;
+            width: 320px;
+        }
+        .comment-text {
+            position: relative;
+            text-indent:2em;
+            color: #808080;
+            font-size: 14px;
+            padding: 12px;
+        }
+        .comment-text::after {
+            position: absolute;
+            top: 0.06em;
+            left: -.7em;
+            font-family: "iconfont" !important;
+            font-size: 32px;
+            color: #808080;
+            font-style: normal;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+
+        }
+        .author-container {
+            color: #808080;
+            font-size: 12px;
+            padding: 12px;
+            text-align: right;
+        }
+        .author-container .iconfont {
+            font-size: 12px;
+            padding: 2px;
+        }
+
+        .company {
+            color: #333;
+            text-align: right;
+            font-size: 12px;
+            width: 320px;
+        }
+        .company .iconfont {
+            color: tomato;
+            font-size: 12px;
+        }
+        @media screen and (max-width: 512px) {
+            .album-container {
+                display: none;
+            }
+        }
+        .mask {
+            filter: blur(4px);
+            -webkit-filter: blur(4px);
+            -moz-filter: blur(4px);
+            -ms-filter: blur(4px);
+        }
+        .shownow {
+            animation: show 1s;
+
+        }
+        @keyframes show
+        {
+            from {
+                filter: blur(4px);
+                -webkit-filter: blur(4px);
+                -moz-filter: blur(4px);
+                -ms-filter: blur(4px);
+            }
+            to {
+                filter: blur(0);
+                -webkit-filter: blur(0);
+                -moz-filter: blur(0);
+                -ms-filter: blur(0);
+            }
+        }
+    .music {
+    margin: 32px auto;
+    border-radius: 10px;
+}
+
+    .music p {
+        padding: 10px 0;
+        position: relative;
+        opacity: 0.5;
+}
+
+
+    </style>
+<div class="container">
+        <div class="card-container mask">
+            <div class="album-container">
+                <img class="album-img" id="album-img" src="{{ data.images }}?param=320y320"/>
+            </div>
+            <div class="comment-container">
+                <div class="comment-text" id="comment-text">&nbsp;&nbsp;少女正在祈祷中... </div>
+                <div class="author-container">
+                    <div class="author-text">来自 @<span id="commnet-user">加载中...</span></div>
+                    <div class="author-text">在<strong>「<span id="song-name">加载中...</span>」</strong></div>
+                    <div class="author-text"><i class="iconfont icon-musiccloud"></i>歌曲下方的评论</div>
+                    <div class="author-text">于<strong>「<span id="commnet-date">加载中...</span>」</strong></div>
+
+                </div>
+
+             <div class="company">
+                <span>乐评 已分发<i id="api-request-count">{{ data.api_request_count }}</i>次<i class="iconfont icon-like"></i> Designed by <a href="https://blog.wangmao.me/" target="_blank">Secret</a></span>
+            </div>
+            </div>
+
+        </div>
+</div>
+	<div class="music">
+        <div id="player3" class="aplayer">
+           <pre class="aplayer-lrc-content">
+              {% for lrc in data.format_lrc %}
+                    {{ lrc }}
+                {% endfor %}
+            </pre>
+        </div>
+    </div>
+    <div id="text" style="text-align: center">{% for foo in data.pretty_lrc %}
+                    <p>{{ foo }}<p>
+                {% endfor %}
+    </div>
+
+
+
+
+</div>
+</article>
+
+
+
+
+{% endblock %}
+
+
+{% block js %}
+
+<script src="https://cdn.bootcss.com/fetch/2.0.3/fetch.min.js"></script>
+<script src="https://cdn.mongona.com/static/js/rgbaster.min.js"></script>
+<script src="https://cdn.mongona.com/static/APlayer.min.js"></script>
+
+<script>
+        function getHotComment() {
+
+            $('.card-container').addClass('mask');
+            $('.card-container').removeClass('shownow');
+
+                var album = new Image();
+                album.src = "{{ data.images }}?param=280y280";
+                album.alt  = "{{ data.title }}封面图";
+                album.onload = function () {
+                    // TODO 加载动画
+                    $('#album-img').attr('src', album.src);
+                    $('#album-img').attr('alt', album.alt);   //alt="上海鲜花港 - 郁金香"
+                    $('#comment-text').text("{{ data.comment_content }}");
+                    $('#commnet-user').text("{{ data.comment_nickname }}");
+                    $('#song-name').text("{{ data.title }}");
+                    $('#commnet-date').text("{{ data.comment_pub_date }}");
+                    {#$('.aplayer-lrc-content').text("{{ data.lrc }}");#}
+
+                    $('.card-container').addClass('shownow');
+                    $('.card-container').removeClass('mask');
+                    // 获取专辑主色调 取反色设置文字
+                    RGBaster.colors(album, {
+                        success: function(payload) {
+                            var c = payload.dominant.match(/\d+/g);
+                            var Color = `rgba(${c[0]},${c[1]},${c[2]},0.8)`;
+                            var grayLevel = c[0] * 0.299 + c[1] * 0.587 + c[2] * 0.114;
+                            if (grayLevel >= 192) {
+                                $('container > a').css('color', '#333');
+                                {#$('.company').css('color', '#333');#}
+                            } else {
+                                $('container > a').css('color', '#EEE');
+                                {#$('.company').css('color', '#EEE');#}
+                            }
+
+                        }
+                    });
+                };
+
+        }
+        getHotComment();
+        var ap3 = new APlayer({
+            element: document.getElementById('player3'),//样式1
+            narrow: false,
+            autoplay: false,
+            showlrc: true,
+            music: {
+                title: "{{ data.title }}",
+                author: "{{ data.author }}",
+                url: "{{ data.mp3_url }}",
+                pic: "{{ data.images }}"
+            }
+        });
+        ap3.init();
+</script>
+{% endblock %}
+
+

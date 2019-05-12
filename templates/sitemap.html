@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<urlset>
+    {% for ac in articles %}
+        <url>
+            <loc>http://www.mongona.com/blog/{{ ac.id }}</loc>
+            <lastmod>{{ ac.article_update_time | date:"Y-m-d" }}</lastmod>
+            <changefreq>daily</changefreq>
+            <priority>0.8</priority>
+        </url>
+    {% endfor %}
+</urlset>
