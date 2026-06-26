@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load mytags %}
+{% block site_title %}Tech Radar | {{ siteinfo.site_name }}{% endblock %}
+{% block meta_keywords %}AI新闻,技术雷达,Python,Go,云原生,开源,运维,安全,技术文档{% endblock %}
+{% block meta_description %}{{ seo_description|default:"Mongona 技术雷达每日聚合 AI、开源、Python、Go、云原生、运维、安全等技术新闻和技术文档。" }}{% endblock %}
+{% block article %}
+<div class="growth-page radar-page">
+    <section class="growth-hero">
+        <div class="growth-kicker">Mongona Intelligence</div>
+        <h2>技术雷达</h2>
+        <p>每天自动聚合 AI、开源、Python、云原生、运维、安全等技术信号，保留原文入口与转载声明，帮读者快速判断什么值得看。</p>
+        <div class="growth-metrics">
+            <div><strong>{{ radar_stats.total }}</strong><span>聚合文章</span></div>
+            <div><strong>{{ radar_stats.recent }}</strong><span>24h 新增</span></div>
+            <div><strong>{{ radar_stats.ai }}</strong><span>AI 信号</span></div>
+            <div><strong>{{ source_tags|length }}</strong><span>来源标签</span></div>
+        </div>
+    </section>
+
+    <form class="radar-search" method="get" action="/radar/">
+        <input type="text" name="q" value="{{ q }}" placeholder="搜索 AI、Python、Cloudflare、Kubernetes">
+        {% if active_tag %}<input type="hidden" name="t" value="{{ active_tag }}">{% endif %}
+        <button type="submit">Search</button>
+    </form>
+
+    <div class="radar-tags">
+        <a class="{% if not active_tag %}active{% endif %}" href="/radar/{% if q %}?q={{ q|urlencode }}{% endif %}">All</a>
+        {% for tag in source_tags %}
+            <a class="{% if active_tag == tag %}active{% endif %}"
+               href="/radar/?t={{ tag|urlencode }}{% if q %}&q={{ q|urlencode }}{% endif %}">{{ tag }}</a>
+        {% endfor %}
+    </div>
+
+    {% with radar_ads=sponsor_ads.radar %}
+        {% if radar_ads %}
+            {% for ad in radar_ads %}
+                <section class="growth-conversion-card sponsor-ad-item" data-sponsor-ad-id="{{ ad.id }}">
+                    <button type="button" class="sponsor-ad-close" aria-label="关闭广告" title="关闭广告">&times;</button>
+                    <div>
+                        <div class="growth-kicker">Sponsored Signal</div>
+                        <h3>{{ ad.title }}</h3>
+                        <p>{{ ad.description }}</p>
+                    </div>
+                    <a class="money-button" href="/go/{{ ad.id }}/" target="_blank"
+                       rel="nofollow sponsored noopener">{{ ad.cta_text }}</a>
+                </section>
+            {% endfor %}
+        {% else %}
+            <section class="growth-conversion-card">
+                <div>
+                    <div class="growth-kicker">Sponsored Signal</div>
+                    <h3>开发者产品可以出现在技术雷达里</h3>
+                    <p>适合云服务、AI 工具、开源项目和技术招聘，按月试投，保留赞助标识和原始链接。</p>
+                </div>
+                <a class="money-button" href="/sponsor/#sponsor-plans">查看赞助位</a>
+            </section>
+        {% endif %}
+    {% endwith %}
+
+    <section class="radar-stream">
+        {% for article in contacts %}
+            <article class="radar-card">
+                <div class="radar-card-meta">
+                    <span>{{ article.article_category.category_name|default:"Tech" }}</span>
+                    <span>{{ article.article_tag|default:"RSS" }}</span>
+                    <span>{{ article.article_create_time|date:"Y-m-d H:i" }}</span>
+                    <span>Hot {{ article.article_click }}</span>
+                </div>
+                <h3><a href="/blog/{{ article.id }}">{{ article.article_title }}</a></h3>
+                <p>{{ article.article_synopsis|striptags|truncatechars:180 }}</p>
+                <div class="radar-card-actions">
+                    <a href="/blog/{{ article.id }}">阅读摘要</a>
+                    <span>转载聚合，原文版权归来源站点</span>
+                </div>
+            </article>
+        {% empty %}
+            <div class="empty-state">暂时没有匹配的技术信号。</div>
+        {% endfor %}
+    </section>
+
+    <ul class="am-pagination am-pagination-centered blog-pagination">
+        {% if contacts.has_previous %}
+            <li><a href="?{% if q %}q={{ q|urlencode }}&{% endif %}{% if active_tag %}t={{ active_tag|urlencode }}&{% endif %}p={{ contacts.previous_page_number }}">&laquo; Pre page</a></li>
+        {% endif %}
+        {% for p in pages %}
+            <li class="{% if p == page_number %}am-active{% endif %}"><a href="?{% if q %}q={{ q|urlencode }}&{% endif %}{% if active_tag %}t={{ active_tag|urlencode }}&{% endif %}p={{ p }}">{{ p }}</a></li>
+        {% endfor %}
+        {% if contacts.has_next %}
+            <li><a href="?{% if q %}q={{ q|urlencode }}&{% endif %}{% if active_tag %}t={{ active_tag|urlencode }}&{% endif %}p={{ contacts.next_page_number }}">Next page &raquo;</a></li>
+        {% endif %}
+    </ul>
+
+    <section class="growth-note">
+        <strong>合规说明：</strong>技术雷达只保存公开 Feed 的摘要/摘录和原文链接，正文页会注明来源与转载声明。若来源站点不希望被聚合，可以联系站长删除。
+    </section>
+</div>
+{% endblock %}

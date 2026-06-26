@@ -1,0 +1,659 @@
+{% extends 'base.html' %}
+{% block site_title %}{% if active_tool %}{{ active_tool.name }} | {% endif %}Developer Tools | {{ siteinfo.site_name }}{% endblock %}
+{% block meta_keywords %}JSON格式化,JWT解析,时间戳转换,Cron表达式,SQL格式化,Markdown预览,颜色转换,HTTP状态码,CIDR计算,Dockerfile生成,URL编码,Base64,SHA哈希,UUID,正则表达式,User-Agent,开发者工具,在线工具{% endblock %}
+{% block meta_description %}{{ seo_description|default:"Mongona 开发者工具箱，提供 JSON、JWT、时间戳、Cron、SQL、Markdown、颜色转换、HTTP 状态码、CIDR、Dockerfile、URL/Base64、哈希、UUID、正则和 User-Agent 等在线工具。" }}{% endblock %}
+{% block article %}
+<div class="growth-page tools-page">
+    <section class="growth-hero">
+        <div class="growth-kicker">{% if active_tool %}Developer Utility{% else %}Build Faster{% endif %}</div>
+        <h2>{% if active_tool %}{{ active_tool.name }}{% else %}开发者工具箱{% endif %}</h2>
+        <p>{% if active_tool %}{{ active_tool.desc }} {{ active_tool.detail }}{% else %}覆盖日常调试、排障和学习场景。当前版本全部在浏览器本地运行，不上传输入内容。{% endif %}</p>
+    </section>
+
+    {% with tools_ads=sponsor_ads.tools %}
+        {% if tools_ads %}
+            {% for ad in tools_ads %}
+                <section class="growth-conversion-card sponsor-ad-item" data-sponsor-ad-id="{{ ad.id }}">
+                    <button type="button" class="sponsor-ad-close" aria-label="关闭广告" title="关闭广告">&times;</button>
+                    <div>
+                        <div class="growth-kicker">Sponsored Tool</div>
+                        <h3>{{ ad.title }}</h3>
+                        <p>{{ ad.description }}</p>
+                    </div>
+                    <a class="money-button" href="/go/{{ ad.id }}/" target="_blank"
+                       rel="nofollow sponsored noopener">{{ ad.cta_text }}</a>
+                </section>
+            {% endfor %}
+        {% else %}
+            <section class="growth-conversion-card">
+                <div>
+                    <div class="growth-kicker">Custom Tools</div>
+                    <h3>需要把这里的工具做成你的内部版本？</h3>
+                    <p>可以定制字段、导出、权限、部署和数据留存策略，适合小团队先做轻量自动化。</p>
+                </div>
+                <a class="money-button" href="/sponsor/#lead-form">提交定制需求</a>
+            </section>
+        {% endif %}
+    {% endwith %}
+
+    <nav class="growth-note" aria-label="工具导航">
+        {% for tool in tools %}
+            <a href="/tools/{{ tool.slug }}/">{{ tool.name }}</a>{% if not forloop.last %} · {% endif %}
+        {% endfor %}
+    </nav>
+
+    <section class="tool-grid">
+        <article class="tool-card">
+            <div class="tool-card-head"><span>JSON</span><strong>JSON 格式化</strong></div>
+            <textarea id="tool-json-input" placeholder='{"hello":"mongona"}'></textarea>
+            <div class="tool-actions">
+                <button type="button" data-json-action="format">格式化</button>
+                <button type="button" data-json-action="minify">压缩</button>
+            </div>
+            <pre id="tool-json-output"></pre>
+        </article>
+
+        <article class="tool-card">
+            <div class="tool-card-head"><span>JWT</span><strong>JWT 解析</strong></div>
+            <textarea id="tool-jwt-input" placeholder="粘贴 JWT Token"></textarea>
+            <div class="tool-actions">
+                <button type="button" id="tool-jwt-decode">解析</button>
+            </div>
+            <pre id="tool-jwt-output"></pre>
+        </article>
+
+        <article class="tool-card">
+            <div class="tool-card-head"><span>TIME</span><strong>时间戳转换</strong></div>
+            <input id="tool-time-input" type="text" placeholder="秒或毫秒时间戳">
+            <div class="tool-actions">
+                <button type="button" id="tool-time-now">当前时间</button>
+                <button type="button" id="tool-time-convert">转换</button>
+            </div>
+            <pre id="tool-time-output"></pre>
+        </article>
+
+        <article class="tool-card">
+            <div class="tool-card-head"><span>CRON</span><strong>Cron 表达式速查</strong></div>
+            <input id="tool-cron-input" type="text" placeholder="23 6 * * *">
+            <div class="tool-actions">
+                <button type="button" id="tool-cron-explain">解释</button>
+            </div>
+            <pre id="tool-cron-output"></pre>
+        </article>
+
+        <article class="tool-card">
+            <div class="tool-card-head"><span>SQL</span><strong>SQL 格式化</strong></div>
+            <textarea id="tool-sql-input" placeholder="select id,name from users where status=1 order by id desc"></textarea>
+            <div class="tool-actions">
+                <button type="button" id="tool-sql-format">格式化</button>
+                <button type="button" id="tool-sql-minify">压缩</button>
+            </div>
+            <pre id="tool-sql-output"></pre>
+        </article>
+
+        <article class="tool-card">
+            <div class="tool-card-head"><span>MD</span><strong>Markdown 预览</strong></div>
+            <textarea id="tool-md-input" placeholder="## 标题&#10;这是一段 **Markdown** 文本。"></textarea>
+            <div class="tool-actions">
+                <button type="button" id="tool-md-preview">生成 HTML</button>
+            </div>
+            <pre id="tool-md-output"></pre>
+        </article>
+
+        <article class="tool-card">
+            <div class="tool-card-head"><span>COLOR</span><strong>颜色转换器</strong></div>
+            <input id="tool-color-input" type="text" placeholder="#0071e3 或 rgb(0,113,227)">
+            <div class="tool-actions">
+                <button type="button" id="tool-color-convert">转换颜色</button>
+            </div>
+            <pre id="tool-color-output"></pre>
+        </article>
+
+        <article class="tool-card">
+            <div class="tool-card-head"><span>HTTP</span><strong>HTTP 状态码速查</strong></div>
+            <input id="tool-http-input" type="text" placeholder="404">
+            <div class="tool-actions">
+                <button type="button" id="tool-http-lookup">查询</button>
+            </div>
+            <pre id="tool-http-output"></pre>
+        </article>
+
+        <article class="tool-card">
+            <div class="tool-card-head"><span>CIDR</span><strong>CIDR 计算器</strong></div>
+            <input id="tool-cidr-input" type="text" placeholder="192.168.1.10/24">
+            <div class="tool-actions">
+                <button type="button" id="tool-cidr-calc">计算网段</button>
+            </div>
+            <pre id="tool-cidr-output"></pre>
+        </article>
+
+        <article class="tool-card">
+            <div class="tool-card-head"><span>DOCKER</span><strong>Dockerfile 生成器</strong></div>
+            <select id="tool-docker-runtime">
+                <option value="python">Python / Django</option>
+                <option value="node">Node.js</option>
+                <option value="go">Go</option>
+                <option value="nginx">Nginx 静态站点</option>
+            </select>
+            <div class="tool-actions">
+                <button type="button" id="tool-docker-generate">生成模板</button>
+            </div>
+            <pre id="tool-docker-output"></pre>
+        </article>
+
+        <article class="tool-card">
+            <div class="tool-card-head"><span>URL</span><strong>URL 编码解码</strong></div>
+            <textarea id="tool-url-input" placeholder="https://www.mongona.com/?q=中文&amp;from=tools"></textarea>
+            <div class="tool-actions">
+                <button type="button" data-url-action="encode">编码</button>
+                <button type="button" data-url-action="decode">解码</button>
+            </div>
+            <pre id="tool-url-output"></pre>
+        </article>
+
+        <article class="tool-card">
+            <div class="tool-card-head"><span>B64</span><strong>Base64 编码解码</strong></div>
+            <textarea id="tool-base64-input" placeholder="输入要转换的 UTF-8 文本或 Base64 字符串"></textarea>
+            <div class="tool-actions">
+                <button type="button" data-base64-action="encode">编码</button>
+                <button type="button" data-base64-action="decode">解码</button>
+            </div>
+            <pre id="tool-base64-output"></pre>
+        </article>
+
+        <article class="tool-card">
+            <div class="tool-card-head"><span>HASH</span><strong>SHA 哈希生成器</strong></div>
+            <textarea id="tool-hash-input" placeholder="输入需要生成摘要的文本"></textarea>
+            <div class="tool-actions">
+                <button type="button" data-hash-algo="SHA-256">SHA-256</button>
+                <button type="button" data-hash-algo="SHA-1">SHA-1</button>
+                <button type="button" data-hash-algo="SHA-512">SHA-512</button>
+            </div>
+            <pre id="tool-hash-output"></pre>
+        </article>
+
+        <article class="tool-card">
+            <div class="tool-card-head"><span>UUID</span><strong>UUID 生成器</strong></div>
+            <input id="tool-uuid-count" type="text" placeholder="生成数量，默认 5">
+            <div class="tool-actions">
+                <button type="button" id="tool-uuid-generate">生成 UUID</button>
+            </div>
+            <pre id="tool-uuid-output"></pre>
+        </article>
+
+        <article class="tool-card">
+            <div class="tool-card-head"><span>REGEX</span><strong>正则表达式测试</strong></div>
+            <input id="tool-regex-pattern" type="text" placeholder="正则，例如 \\b\\w+@\\w+\\.com\\b">
+            <input id="tool-regex-flags" type="text" placeholder="flags，例如 gi">
+            <textarea id="tool-regex-text" placeholder="输入待匹配文本"></textarea>
+            <div class="tool-actions">
+                <button type="button" id="tool-regex-test">测试匹配</button>
+            </div>
+            <pre id="tool-regex-output"></pre>
+        </article>
+
+        <article class="tool-card">
+            <div class="tool-card-head"><span>UA</span><strong>User-Agent 解析</strong></div>
+            <textarea id="tool-ua-input" placeholder="粘贴浏览器 User-Agent"></textarea>
+            <div class="tool-actions">
+                <button type="button" id="tool-ua-parse">解析</button>
+                <button type="button" id="tool-ua-current">使用当前 UA</button>
+            </div>
+            <pre id="tool-ua-output"></pre>
+        </article>
+    </section>
+
+    <section class="growth-note">
+        {% if active_tool %}
+            <strong>{{ active_tool.name }} 使用场景：</strong>
+            {% for item in active_tool.use_cases %}{{ item }}{% if not forloop.last %} / {% endif %}{% endfor %}。输入内容只在浏览器本地处理，适合日常调试和问题定位。
+        {% else %}
+            工具箱覆盖接口调试、编码转换、日志排查、容器化模板、网络计算和前端样式校验等高频开发场景。输入内容只在浏览器本地处理，适合快速验证、问题定位和日常调试。
+        {% endif %}
+    </section>
+</div>
+{% endblock %}
+{% block js %}
+{{ block.super }}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "{% if active_tool %}{{ active_tool.name|escapejs }}{% else %}Mongona Developer Tools{% endif %}",
+    "url": "{{ canonical_url|escapejs }}",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Any",
+    "description": "{{ seo_description|escapejs }}",
+    "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "CNY"
+    }
+}
+</script>
+<script>
+(function () {
+    function text(id) {
+        return document.getElementById(id);
+    }
+
+    function safeBase64UrlDecode(value) {
+        value = value.replace(/-/g, '+').replace(/_/g, '/');
+        while (value.length % 4) {
+            value += '=';
+        }
+        return decodeURIComponent(escape(window.atob(value)));
+    }
+
+    function writeOutput(id, value) {
+        text(id).textContent = value;
+    }
+
+    function bytesToHex(buffer) {
+        return Array.prototype.map.call(new Uint8Array(buffer), function (byte) {
+            return ('00' + byte.toString(16)).slice(-2);
+        }).join('');
+    }
+
+    function utf8ToBase64(value) {
+        return window.btoa(unescape(encodeURIComponent(value)));
+    }
+
+    function base64ToUtf8(value) {
+        return decodeURIComponent(escape(window.atob(value)));
+    }
+
+    function uuidV4() {
+        if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+            return window.crypto.randomUUID();
+        }
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (char) {
+            var random = Math.random() * 16 | 0;
+            var value = char === 'x' ? random : (random & 0x3 | 0x8);
+            return value.toString(16);
+        });
+    }
+
+    function parseUserAgent(ua) {
+        var browser = 'Unknown';
+        var os = 'Unknown';
+        var device = /mobile|iphone|android/i.test(ua) ? 'Mobile' : 'Desktop';
+        if (/Edg\//.test(ua)) {
+            browser = 'Microsoft Edge';
+        } else if (/Chrome\//.test(ua) && !/Chromium|Edg\//.test(ua)) {
+            browser = 'Chrome';
+        } else if (/Firefox\//.test(ua)) {
+            browser = 'Firefox';
+        } else if (/Safari\//.test(ua) && /Version\//.test(ua)) {
+            browser = 'Safari';
+        }
+        if (/Windows NT/.test(ua)) {
+            os = 'Windows';
+        } else if (/Mac OS X/.test(ua)) {
+            os = 'macOS / iOS';
+        } else if (/Android/.test(ua)) {
+            os = 'Android';
+        } else if (/Linux/.test(ua)) {
+            os = 'Linux';
+        }
+        return {
+            browser: browser,
+            os: os,
+            device: device,
+            isBot: /bot|spider|crawler|slurp|bingpreview/i.test(ua)
+        };
+    }
+
+    function escapeHtml(value) {
+        return String(value || '').replace(/[&<>"']/g, function (char) {
+            return ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            })[char];
+        });
+    }
+
+    function formatSql(sql) {
+        var result = String(sql || '').replace(/\s+/g, ' ').trim();
+        var clauses = [
+            'SELECT', 'FROM', 'WHERE', 'LEFT JOIN', 'RIGHT JOIN', 'INNER JOIN',
+            'JOIN', 'GROUP BY', 'ORDER BY', 'HAVING', 'LIMIT', 'VALUES', 'SET'
+        ];
+        clauses.forEach(function (clause) {
+            result = result.replace(new RegExp('\\s+(' + clause.replace(' ', '\\s+') + ')\\s+', 'ig'), '\n$1 ');
+        });
+        return result.replace(/,\s*/g, ',\n  ').replace(/^\n/, '').trim();
+    }
+
+    function markdownToHtml(value) {
+        var html = escapeHtml(value);
+        html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+        html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+        html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+        html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+        html = html.replace(/\n{2,}/g, '\n\n');
+        return html.split(/\n\n/).map(function (block) {
+            if (/^<h[1-3]>/.test(block)) {
+                return block;
+            }
+            return '<p>' + block.replace(/\n/g, '<br>') + '</p>';
+        }).join('\n');
+    }
+
+    function parseColor(value) {
+        var hexMatch;
+        var rgbMatch;
+        value = String(value || '').trim();
+        hexMatch = value.match(/^#?([0-9a-f]{3}|[0-9a-f]{6})$/i);
+        if (hexMatch) {
+            var hex = hexMatch[1];
+            if (hex.length === 3) {
+                hex = hex.replace(/(.)/g, '$1$1');
+            }
+            return {
+                r: parseInt(hex.slice(0, 2), 16),
+                g: parseInt(hex.slice(2, 4), 16),
+                b: parseInt(hex.slice(4, 6), 16)
+            };
+        }
+        rgbMatch = value.match(/^rgba?\((\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})/i);
+        if (rgbMatch) {
+            return {
+                r: Math.min(255, Number(rgbMatch[1])),
+                g: Math.min(255, Number(rgbMatch[2])),
+                b: Math.min(255, Number(rgbMatch[3]))
+            };
+        }
+        return null;
+    }
+
+    function componentToHex(value) {
+        return ('0' + value.toString(16)).slice(-2);
+    }
+
+    function rgbToHsl(color) {
+        var r = color.r / 255;
+        var g = color.g / 255;
+        var b = color.b / 255;
+        var max = Math.max(r, g, b);
+        var min = Math.min(r, g, b);
+        var h = 0;
+        var s = 0;
+        var l = (max + min) / 2;
+        var d;
+        if (max !== min) {
+            d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            if (max === r) {
+                h = (g - b) / d + (g < b ? 6 : 0);
+            } else if (max === g) {
+                h = (b - r) / d + 2;
+            } else {
+                h = (r - g) / d + 4;
+            }
+            h /= 6;
+        }
+        return {
+            h: Math.round(h * 360),
+            s: Math.round(s * 100),
+            l: Math.round(l * 100)
+        };
+    }
+
+    function ipToInt(ip) {
+        var parts = ip.split('.');
+        if (parts.length !== 4) {
+            return null;
+        }
+        var total = 0;
+        for (var i = 0; i < parts.length; i += 1) {
+            var part = Number(parts[i]);
+            if (!/^\d+$/.test(parts[i]) || part < 0 || part > 255) {
+                return null;
+            }
+            total = ((total << 8) + part) >>> 0;
+        }
+        return total >>> 0;
+    }
+
+    function intToIp(value) {
+        return [
+            (value >>> 24) & 255,
+            (value >>> 16) & 255,
+            (value >>> 8) & 255,
+            value & 255
+        ].join('.');
+    }
+
+    function dockerfileTemplate(runtime) {
+        var templates = {
+            python: 'FROM python:3.11-slim\nWORKDIR /app\nCOPY requirements.txt .\nRUN pip install --no-cache-dir -r requirements.txt\nCOPY . .\nEXPOSE 8000\nCMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]',
+            node: 'FROM node:20-alpine\nWORKDIR /app\nCOPY package*.json ./\nRUN npm ci --only=production\nCOPY . .\nEXPOSE 3000\nCMD ["npm", "start"]',
+            go: 'FROM golang:1.22-alpine AS build\nWORKDIR /src\nCOPY . .\nRUN go build -o app .\nFROM alpine:3.20\nWORKDIR /app\nCOPY --from=build /src/app .\nEXPOSE 8080\nCMD ["./app"]',
+            nginx: 'FROM nginx:1.27-alpine\nCOPY ./dist /usr/share/nginx/html\nEXPOSE 80\nCMD ["nginx", "-g", "daemon off;"]'
+        };
+        return templates[runtime] || templates.python;
+    }
+
+    $('.tool-actions button[data-json-action]').on('click', function () {
+        var action = $(this).data('json-action');
+        try {
+            var parsed = JSON.parse(text('tool-json-input').value);
+            writeOutput('tool-json-output', action === 'minify' ? JSON.stringify(parsed) : JSON.stringify(parsed, null, 2));
+        } catch (err) {
+            writeOutput('tool-json-output', 'JSON 解析失败: ' + err.message);
+        }
+    });
+
+    $('#tool-jwt-decode').on('click', function () {
+        var token = text('tool-jwt-input').value.trim();
+        var parts = token.split('.');
+        if (parts.length < 2) {
+            writeOutput('tool-jwt-output', '不是合法的 JWT。');
+            return;
+        }
+        try {
+            var header = JSON.parse(safeBase64UrlDecode(parts[0]));
+            var payload = JSON.parse(safeBase64UrlDecode(parts[1]));
+            writeOutput('tool-jwt-output', JSON.stringify({header: header, payload: payload}, null, 2));
+        } catch (err) {
+            writeOutput('tool-jwt-output', 'JWT 解析失败: ' + err.message);
+        }
+    });
+
+    $('#tool-time-now').on('click', function () {
+        var now = Date.now();
+        text('tool-time-input').value = String(now);
+        writeOutput('tool-time-output', '毫秒: ' + now + '\n秒: ' + Math.floor(now / 1000) + '\n本地时间: ' + new Date(now).toLocaleString());
+    });
+
+    $('#tool-time-convert').on('click', function () {
+        var raw = text('tool-time-input').value.trim();
+        var num = Number(raw);
+        if (!raw || isNaN(num)) {
+            writeOutput('tool-time-output', '请输入秒或毫秒时间戳。');
+            return;
+        }
+        var ms = raw.length <= 10 ? num * 1000 : num;
+        writeOutput('tool-time-output', '本地时间: ' + new Date(ms).toLocaleString() + '\nISO: ' + new Date(ms).toISOString());
+    });
+
+    $('#tool-cron-explain').on('click', function () {
+        var cron = text('tool-cron-input').value.trim() || '23 6 * * *';
+        var parts = cron.split(/\s+/);
+        if (parts.length !== 5) {
+            writeOutput('tool-cron-output', '目前支持 5 段 Cron: 分 时 日 月 周。');
+            return;
+        }
+        writeOutput('tool-cron-output',
+            '分钟: ' + parts[0] + '\n小时: ' + parts[1] + '\n日期: ' + parts[2] +
+            '\n月份: ' + parts[3] + '\n星期: ' + parts[4] +
+            '\n提示: * 表示每一个周期，逗号表示多个值，*/n 表示每 n 个周期。'
+        );
+    });
+
+    $('#tool-sql-format').on('click', function () {
+        writeOutput('tool-sql-output', formatSql(text('tool-sql-input').value));
+    });
+
+    $('#tool-sql-minify').on('click', function () {
+        writeOutput('tool-sql-output', text('tool-sql-input').value.replace(/\s+/g, ' ').trim());
+    });
+
+    $('#tool-md-preview').on('click', function () {
+        writeOutput('tool-md-output', markdownToHtml(text('tool-md-input').value));
+    });
+
+    $('#tool-color-convert').on('click', function () {
+        var color = parseColor(text('tool-color-input').value);
+        if (!color) {
+            writeOutput('tool-color-output', '请输入 HEX 或 RGB 颜色，例如 #0071e3。');
+            return;
+        }
+        var hsl = rgbToHsl(color);
+        writeOutput('tool-color-output',
+            'HEX: #' + componentToHex(color.r) + componentToHex(color.g) + componentToHex(color.b) +
+            '\nRGB: rgb(' + color.r + ', ' + color.g + ', ' + color.b + ')' +
+            '\nHSL: hsl(' + hsl.h + ', ' + hsl.s + '%, ' + hsl.l + '%)'
+        );
+    });
+
+    $('#tool-http-lookup').on('click', function () {
+        var code = text('tool-http-input').value.trim();
+        var statusMap = {
+            '200': 'OK: 请求成功',
+            '201': 'Created: 资源已创建',
+            '204': 'No Content: 请求成功但无响应体',
+            '301': 'Moved Permanently: 永久重定向',
+            '302': 'Found: 临时重定向',
+            '304': 'Not Modified: 缓存仍可用',
+            '400': 'Bad Request: 请求参数或格式错误',
+            '401': 'Unauthorized: 未认证',
+            '403': 'Forbidden: 已认证但无权限或被策略拒绝',
+            '404': 'Not Found: 资源不存在',
+            '405': 'Method Not Allowed: 请求方法不允许',
+            '429': 'Too Many Requests: 请求过于频繁',
+            '500': 'Internal Server Error: 服务端异常',
+            '502': 'Bad Gateway: 上游服务异常',
+            '503': 'Service Unavailable: 服务暂不可用',
+            '504': 'Gateway Timeout: 上游超时'
+        };
+        writeOutput('tool-http-output', statusMap[code] || '未收录该状态码，可以先按首位判断: 2xx 成功，3xx 重定向，4xx 客户端问题，5xx 服务端问题。');
+    });
+
+    $('#tool-cidr-calc').on('click', function () {
+        var raw = text('tool-cidr-input').value.trim();
+        var parts = raw.split('/');
+        var ip = parts[0];
+        var prefix = Number(parts[1]);
+        var ipInt = ipToInt(ip);
+        if (ipInt === null || isNaN(prefix) || prefix < 0 || prefix > 32) {
+            writeOutput('tool-cidr-output', '请输入合法 IPv4 CIDR，例如 192.168.1.10/24。');
+            return;
+        }
+        var mask = prefix === 0 ? 0 : (0xffffffff << (32 - prefix)) >>> 0;
+        var network = (ipInt & mask) >>> 0;
+        var broadcast = (network | (~mask >>> 0)) >>> 0;
+        var first = prefix >= 31 ? network : network + 1;
+        var last = prefix >= 31 ? broadcast : broadcast - 1;
+        writeOutput('tool-cidr-output',
+            '网络地址: ' + intToIp(network) +
+            '\n子网掩码: ' + intToIp(mask) +
+            '\n广播地址: ' + intToIp(broadcast) +
+            '\n可用范围: ' + intToIp(first) + ' - ' + intToIp(last) +
+            '\n地址数量: ' + Math.pow(2, 32 - prefix)
+        );
+    });
+
+    $('#tool-docker-generate').on('click', function () {
+        writeOutput('tool-docker-output', dockerfileTemplate(text('tool-docker-runtime').value));
+    });
+
+    $('.tool-actions button[data-url-action]').on('click', function () {
+        var action = $(this).data('url-action');
+        var value = text('tool-url-input').value;
+        try {
+            writeOutput('tool-url-output', action === 'encode' ? encodeURIComponent(value) : decodeURIComponent(value));
+        } catch (err) {
+            writeOutput('tool-url-output', 'URL 转换失败: ' + err.message);
+        }
+    });
+
+    $('.tool-actions button[data-base64-action]').on('click', function () {
+        var action = $(this).data('base64-action');
+        var value = text('tool-base64-input').value.trim();
+        try {
+            writeOutput('tool-base64-output', action === 'encode' ? utf8ToBase64(value) : base64ToUtf8(value));
+        } catch (err) {
+            writeOutput('tool-base64-output', 'Base64 转换失败: ' + err.message);
+        }
+    });
+
+    $('.tool-actions button[data-hash-algo]').on('click', function () {
+        var algo = $(this).data('hash-algo');
+        var value = text('tool-hash-input').value;
+        if (!window.crypto || !window.crypto.subtle || !window.TextEncoder) {
+            writeOutput('tool-hash-output', '当前浏览器不支持 Web Crypto API。');
+            return;
+        }
+        window.crypto.subtle.digest(algo, new TextEncoder().encode(value)).then(function (hash) {
+            writeOutput('tool-hash-output', algo + ':\n' + bytesToHex(hash));
+        }).catch(function (err) {
+            writeOutput('tool-hash-output', '哈希生成失败: ' + err.message);
+        });
+    });
+
+    $('#tool-uuid-generate').on('click', function () {
+        var count = Number(text('tool-uuid-count').value.trim() || 5);
+        var result = [];
+        if (isNaN(count) || count < 1) {
+            count = 5;
+        }
+        count = Math.min(50, Math.floor(count));
+        for (var i = 0; i < count; i += 1) {
+            result.push(uuidV4());
+        }
+        writeOutput('tool-uuid-output', result.join('\n'));
+    });
+
+    $('#tool-regex-test').on('click', function () {
+        var pattern = text('tool-regex-pattern').value;
+        var flags = text('tool-regex-flags').value || 'g';
+        var sample = text('tool-regex-text').value;
+        var output = [];
+        try {
+            var regex = new RegExp(pattern, flags);
+            var matches = sample.match(regex) || [];
+            output.push('匹配数量: ' + matches.length);
+            matches.slice(0, 30).forEach(function (match, index) {
+                output.push((index + 1) + '. ' + match);
+            });
+            if (matches.length > 30) {
+                output.push('仅展示前 30 条匹配。');
+            }
+            writeOutput('tool-regex-output', output.join('\n'));
+        } catch (err) {
+            writeOutput('tool-regex-output', '正则错误: ' + err.message);
+        }
+    });
+
+    $('#tool-ua-current').on('click', function () {
+        text('tool-ua-input').value = window.navigator.userAgent;
+        $('#tool-ua-parse').trigger('click');
+    });
+
+    $('#tool-ua-parse').on('click', function () {
+        var ua = text('tool-ua-input').value.trim();
+        if (!ua) {
+            writeOutput('tool-ua-output', '请粘贴 User-Agent。');
+            return;
+        }
+        writeOutput('tool-ua-output', JSON.stringify(parseUserAgent(ua), null, 2));
+    });
+}());
+</script>
+{% endblock %}

@@ -1,0 +1,1869 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+{% load mytags %}
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="baidu_union_verify" content="a950abb7c305a64d13356bda0615350d">
+    <meta name="google-site-verification" content="9hNa0JrAYyyQJngZX_Xt_smbiCDHXA0royZFCi46nX0" />
+    <title>{% block site_title %}{% endblock site_title %}</title>
+    <link rel="shortcut icon" href="{{ MEDIA_URL }}{{ siteinfo.site_logo }}">
+    <meta name="keywords" content="{% block meta_keywords %}Python,Django,Go,Java,SQL,Linux,JavaScript,jQuery,Git,AI,云计算,开发工具,技术博客{% endblock meta_keywords %}">
+    <meta name="description" content="{% block meta_description %}{{ seo_description|default:"Mongona 为 IT 开发者提供技术文章、技术雷达、开发者工具和自动化实践。"}}{% endblock meta_description %}">
+    <link rel="canonical" href="{% if canonical_url %}{{ canonical_url }}{% else %}{{ request.build_absolute_uri }}{% endif %}">
+    <link rel="alternate" type="application/rss+xml" title="{{ siteinfo.site_name }} RSS" href="https://www.mongona.com/rss.xml">
+    <meta property="og:site_name" content="{{ siteinfo.site_name }}">
+    <meta property="og:type" content="{{ og_type|default:"website" }}">
+    <meta property="og:title" content="{% if seo_title %}{{ seo_title }} | {{ siteinfo.site_name }}{% else %}{{ siteinfo.site_name }}{% endif %}">
+    <meta property="og:description" content="{{ seo_description|default:"Mongona 为 IT 开发者提供技术文章、技术雷达、开发者工具和自动化实践。" }}">
+    <meta property="og:url" content="{% if canonical_url %}{{ canonical_url }}{% else %}{{ request.build_absolute_uri }}{% endif %}">
+    <meta property="og:image" content="{% if og_image %}{{ og_image }}{% else %}{{ banner }}{% endif %}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{% if seo_title %}{{ seo_title }} | {{ siteinfo.site_name }}{% else %}{{ siteinfo.site_name }}{% endif %}">
+    <meta name="twitter:description" content="{{ seo_description|default:"Mongona 为 IT 开发者提供技术文章、技术雷达、开发者工具和自动化实践。" }}">
+    <meta name="twitter:image" content="{% if og_image %}{{ og_image }}{% else %}{{ banner }}{% endif %}">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "{{ siteinfo.site_name|escapejs }}",
+        "url": "https://www.mongona.com/",
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://www.mongona.com/?s={search_term_string}",
+            "query-input": "required name=search_term_string"
+        }
+    }
+    </script>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="renderer" content="webkit">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!-- amazeui -->
+    <link href="{% static 'amazeui/assets/css/amazeui.min.css' %}" rel="stylesheet">
+    <!-- 当前站点CSS样式文件 -->
+    <link href="{% static 'main.css' %}?v=20260624piofix3" rel="stylesheet">
+    <link href='https://cdn.mongona.com/static/pio.css' rel='stylesheet' type='text/css'/>
+    <!--music-->
+    <link rel="stylesheet" href="https://cdn.mongona.com/static/APlayer.min.css">
+    {% block css %}{% endblock css %}
+    <!-- jQuery -->
+    <script src="{% static 'amazeui/assets/js/jquery.min.js' %}" type="text/javascript"></script>
+    <!-- amazeui.js app.js -->
+    <script src="{% static 'amazeui/assets/js/amazeui.min.js' %}" type="text/javascript"></script>
+    <!--每日一诗-->
+    <script src="https://sdk.jinrishici.com/v2/browser/jinrishici.js" charset="utf-8" type="text/javascript"></script>
+    {% if page_url != '/?c=4' and page_url != '/?c=5' %}
+    <!-- 引用 Live2D 核心组件 -->
+    <script src='https://cdn.mongona.com/static/l2d.js?v=20260623l2dfix1'></script>
+    <!-- 引用看板娘交互组件 -->
+    <script src='https://cdn.mongona.com/static/pio.js'></script>
+    {% endif %}
+    <script type="text/javascript">
+console.log('在巴甫洛夫条件反射试验中：\n给定一条狗，每次摇铃后喂食，足够次数后，狗则听到铃声将会习惯性的分泌唾液，由此引发对铃声的依恋。\n延伸到实际，给定一个喜欢的妹子，每次见面赠与巴甫洛夫式的礼品或者零食，由此引发妹子的依恋。\n引入薛定谔的猫理论，在未表白前，妹子与自己一直处于一种“概率云”的状态，一旦表白则“概率云”将消失成为实际。\n在巴甫洛夫式未表白时，自己与妹子的关系为“既是恋人又不是恋人”的矛盾体。\n返回巴甫洛夫式试验中，在妹纸形成足够的依恋过后，则可以打破“概率云”的状态，这个谜一样的自己，这一刻薛定谔附体，带着量子论般深沉的哀愁，让她从此不能自拔! \n自此创作巴甫洛夫把妹法和薛定谔把妹法，深藏功与名。')
+    </script>
+    <style>
+        ::selection {
+            background: #00cf7d;
+            color: #333;
+        }
+
+        .sponsor-ad-item {
+            position: relative !important;
+        }
+
+        .sponsor-ad-item.is-dismissed,
+        .codex-sponsor-mini.is-sponsor-empty {
+            display: none !important;
+        }
+
+        .sponsor-ad-close {
+            position: absolute;
+            z-index: 5;
+            top: 12px;
+            right: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            padding: 0;
+            color: #6e6e73;
+            background: rgba(245, 245, 247, .92);
+            border: 0;
+            border-radius: 50%;
+            box-sizing: border-box;
+            cursor: pointer;
+            font-size: 0;
+            line-height: 0;
+            appearance: none;
+            -webkit-appearance: none;
+            transition: background .16s ease, color .16s ease, transform .16s ease;
+        }
+
+        .sponsor-ad-close::before,
+        .sponsor-ad-close::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 11px;
+            height: 1.6px;
+            background: currentColor;
+            border-radius: 999px;
+            transform-origin: center;
+        }
+
+        .sponsor-ad-close::before {
+            transform: translate(-50%, -50%) rotate(45deg);
+        }
+
+        .sponsor-ad-close::after {
+            transform: translate(-50%, -50%) rotate(-45deg);
+        }
+
+        .sponsor-ad-close:hover {
+            color: #1d1d1f;
+            background: rgba(229, 229, 234, .98);
+            transform: scale(1.04);
+        }
+
+        .sponsor-ad-close:focus {
+            outline: 2px solid rgba(0, 113, 227, .36);
+            outline-offset: 2px;
+        }
+
+        .codex-sponsor-mini .sponsor-ad-item {
+            padding-right: 32px;
+        }
+
+        .codex-sponsor-mini .sponsor-ad-close {
+            top: -1px;
+            right: -1px;
+            width: 22px;
+            height: 22px;
+        }
+
+        .growth-page .sponsor-ad-item {
+            padding-right: 54px !important;
+        }
+
+        .article-sponsor-card {
+            margin: 22px 0 !important;
+            padding-right: 54px !important;
+        }
+
+        .article-sponsor-card.article-sponsor-card-image {
+            grid-template-columns: minmax(0, .9fr) minmax(220px, 1fr) !important;
+            align-items: center !important;
+        }
+
+        .article-sponsor-card .article-sponsor-media {
+            display: block;
+            min-width: 0;
+        }
+
+        .article-sponsor-card .article-sponsor-image {
+            display: block;
+            width: 100%;
+            max-height: 280px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .article-sponsor-card .article-sponsor-meta {
+            min-width: 0;
+        }
+
+        .article-sponsor-card .article-sponsor-label {
+            margin-bottom: 8px;
+            color: #86868b;
+            font-size: 12px;
+            font-weight: 800;
+            line-height: 1;
+            text-transform: uppercase;
+        }
+
+        @media only screen and (max-width: 640px) {
+            .growth-page .sponsor-ad-item {
+                padding-right: 48px !important;
+            }
+
+            .article-sponsor-card {
+                padding-right: 48px !important;
+            }
+
+            .article-sponsor-card.article-sponsor-card-image {
+                grid-template-columns: minmax(0, 1fr) !important;
+            }
+        }
+
+        body {
+            font-family: "SF Pro SC", "SF Pro Text", "SF Pro Icons", "PingFang SC", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+
+        }
+
+        .header-weather {
+            color: #fff;
+            position: fixed;
+            z-index: 999;
+            top: 53px;
+            right: 10px;
+            text-align: center;
+            background-color: gray;
+            border-radius: 6px;
+        }
+
+        .weather-t1:after {
+            position: absolute;
+            content: "°";
+        }
+
+        .weather-t2:after {
+            position: absolute;
+        }
+
+        .weather-t1 {
+            font-size: 16px;
+        }
+
+        .weather-t2 {
+            margin-left: 2px;
+            font-size: 10px;
+        }
+
+        .weather-t2:after {
+            top: 8px;
+        }
+
+        .weather-city {
+            font-size: 12px;
+        }
+    </style>
+
+</head>
+<body>
+<header class="am-topbar am-topbar-fixed-top">
+    <div class="am-g am-g-fixed blog-g-fixed">
+        <h1 class="am-topbar-brand am-center">
+            <a href="{% url '' %}" style="font-size:2.8rem">mongona</a>
+        </h1>
+        <button class="am-topbar-btn am-topbar-toggle am-btn am-btn-sm am-btn-primary am-show-sm-only"
+                data-am-collapse="{target: '#doc-topbar-collapse'}">
+            <span class="am-icon-bars"></span></button>
+        <div class="am-collapse am-topbar-collapse" id="doc-topbar-collapse">
+            <ul class="am-nav am-nav-pills am-topbar-nav">
+                <li class="{% if page_url == '/' %}am-active{% endif %}"><a href="{% url '' %}">Home</a></li>
+                <li class="{% if g == 'tech' %}am-active{% endif %}"><a href="{% url '' %}?g=tech">Tech</a></li>
+                <li class="{% if page_url == '/radar/' %}am-active{% endif %}"><a href="/radar/">Radar</a></li>
+                <li class="{% if page_url == '/tools/' %}am-active{% endif %}"><a href="/tools/">Tools</a></li>
+                <li class="{% if page_url == '/sponsor/' %}am-active{% endif %}"><a href="/sponsor/">Sponsor</a></li>
+                <li class="{% if page_url == '/?c=4' %}am-active{% endif %}"><a href="{% url '' %}?c=4">Gallery</a></li>
+                <li class="{% if page_url == '/?c=6' %}am-active{% endif %}"><a href="{% url '' %}?c=6">About</a>
+                </li>
+            </ul>
+            <form class="am-topbar-form am-topbar-left am-form-inline am-topbar-right" action="{% url '' %}">
+
+                <div class="am-form-group">
+                    <input type="text" class="am-form-field am-input-sm bosiinput" placeholder="Search You  🤓️"
+                           name="s">
+                </div>
+                <button type="submit" class="am-btn am-btn-primary am-btn-sm">
+                    <i class="am-icon-search"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</header>
+<div id="siteTopImage" class="site-topimg am-g">
+    <img src="{{ banner }}" class="am-img-responsive am-center" alt="mongona"/>
+</div>
+<a href="https://www.tianqiapi.com"  target="_blank">
+    <div class="header-weather">
+        <span class="weather-t1">--</span>
+        <span class="weather-t2">--</span>
+        <div class="weather-city">正在获取天气</div>
+    </div>
+</a>
+<div id="siteMain" class="am-g am-g-fixed blog-g-fixed">
+    <div class="am-u-md-8">
+        {% block article %}
+            article-content
+        {% endblock article %}
+    </div>
+
+    <div class="am-u-md-4 blog-sidebar">
+        <div class="am-panel-group">
+            <!-- 文章分类 -->
+            <section class="am-panel am-panel-default blog-cat">
+                <div class="am-panel-hd">Category</div>
+                <ul class="am-list am-list-border">
+                    {% for c in categorys %}
+                       <!-- 统计分类下文章数 -->
+
+                        <li>
+                            <a class="am-link-muted" href="{% url '' %}?c={{ c.id }}" title="{{ c.category_detail }}">
+                                <i class="{{ c.category_icon }}"></i>
+                                {{ c.category_name }}
+                                <span class="am-badge am-align-right">{{ c.id | cat_count }}</span>
+                            </a>
+
+                        </li>
+
+                    {% endfor %}
+
+
+                </ul>
+            </section>
+
+            <!-- 标签云 -->
+            <section class="am-panel am-panel-default">
+                <div class="am-panel-hd">Tags</div>
+                <div class="am-panel-bd">
+                    {% for tag in alltags %}
+                        <a href="/tag/{{ tag|urlencode }}/" class="am-badge {{ tagcss | random }}">{{ tag }}</a>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <!-- 站点资料统计 -->
+            <section class="am-panel am-panel-default">
+                <div class="am-panel-hd">Site statistics</div>
+                <div class="am-panel-bd">
+                    <p id="jinrishici-sentence" class="am-link-muted" style="text-align: center; color: red">
+                        正在加载今日诗词....</p>
+                    <p>本站现有文章<span class="am-text-secondary">{{ ac_count }}</span>篇,共被浏览<span
+                            class="am-text-primary">{{ ac_click }}</span>次</p>
+                    <p>本次响应耗时:&nbsp;<span class="am-text-primary"><!!LOAD_TIMES!!>s</span></p>
+                    <p>当前来路IP:&nbsp;<span class="am-text-primary"><!!ip!!>&nbsp;&nbsp;<!!addr!!></span></p>
+                    <p>您是本站第:&nbsp;<span class="am-text-primary"><!!visitor!!></span>&nbsp;位访客!</p>
+                    <p>本站已苟活:&nbsp;<span id="run_time" class="am-text-primary"></span></p>
+                </div>
+            </section>
+
+
+            <section class="am-panel am-panel-default codex-sponsor-mini">
+                <div class="am-panel-hd">Commercial</div>
+                <div class="am-panel-bd">
+                    {% with sidebar_ads=sponsor_ads.sidebar %}
+                        {% if sidebar_ads %}
+                            {% for ad in sidebar_ads %}
+                                <div class="sponsor-ad-item" data-sponsor-ad-id="{{ ad.id }}"{% if not forloop.last %} style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid rgba(0,0,0,.06);"{% endif %}>
+                                    <button type="button" class="sponsor-ad-close" aria-label="关闭广告" title="关闭广告">&times;</button>
+                                    <strong>{{ ad.title }}</strong>
+                                    <p>{{ ad.description }}</p>
+                                    <a href="/go/{{ ad.id }}/" class="growth-sidebar-cta" target="_blank"
+                                       rel="nofollow sponsored noopener">{{ ad.cta_text }}</a>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <strong>开发者产品赞助位开放</strong>
+                            <p>适合 AI 工具、云服务、课程、开源项目和招聘团队。</p>
+                            <a href="/sponsor/" class="growth-sidebar-cta">查看合作方案</a>
+                        {% endif %}
+                    {% endwith %}
+                </div>
+            </section>
+
+            <!-- 热门文章  -->
+            <section class="am-panel am-panel-default blog-cat">
+                <div class="am-panel-hd">All hots</div>
+                <ul class="am-list am-list-border">
+
+                    {% for hac in hot_articles %}
+
+                        <li>
+                            <a class="am-link-muted am-text-truncate" href="{% url '' %}blog/{{ hac.id }}">
+
+                                {{ hac.article_title }}
+
+                            </a>
+
+                        </li>
+                    {% endfor %}
+
+                </ul>
+            </section>
+
+            <!-- 文章归档  -->
+            <section class="am-panel am-panel-default blog-cat">
+                <div class="am-panel-hd">Article archiving
+                </div>
+                <ul class="am-list am-list-border am-list-striped">
+
+                    {% for date in dates %}
+
+                        <li>
+                            <a class="am-link-muted" href="{% url '' %}?d={{ date.year }}-{{ date.month }}">
+
+                                {{ date.year }}年{{ date.month }}月
+
+                            </a>
+
+                        </li>
+                    {% endfor %}
+
+                </ul>
+            </section>
+
+
+        </div>
+    </div>
+
+</div>
+{% if page_url != '/?c=4' and page_url != '/?c=5' %}
+<div class="pio-container codex-pio-stage">
+    <div class="pio-action"></div>
+    <canvas id="pio" width="280" height="250"></canvas>
+</div>
+{% endif %}
+<div class="footer-top">
+    <div class="am-g blog-g-fixed">
+        <div class="am-u-md-3">
+            <h2 class="site-fd am-text-center"><a href="javascript:void(0);" class="am-link-muted">Powered
+                By</a></h2>
+            <ul class="site-links">
+                {% autoescape off %}
+                    {{ siteinfo.site_powered }}
+                {% endautoescape %}
+            </ul>
+        </div>
+        <div class="am-u-md-3">
+            <h2 class="site-fd am-text-center"><a href="javascript:void(0);" class="am-link-muted">传送门</a></h2>
+            <ul class="site-social">
+                {% autoescape off %}
+                    {{ siteinfo.site_links }}
+                {% endautoescape %}
+            </ul>
+        </div>
+        <div class="am-u-md-6">
+            <h2 class="site-fd am-text-center"><a href="javascript:void(0);" class="am-link-muted">Contact
+                me</a></h2>
+            {% autoescape off %}
+                {{ siteinfo.site_contact }}
+            {% endautoescape %}
+        </div>
+    </div>
+</div>
+<footer class="blog-footer am-g">
+    {% autoescape off %}
+        {{ siteinfo.site_footer }}
+    {% endautoescape %}
+</footer>
+<div data-am-widget="gotop" class="am-gotop am-gotop-fixed">
+    <a href="#top" title="飞回顶部">
+        <i class="am-gotop-icon am-icon-chevron-up"></i>
+    </a>
+</div>
+<div id="persistentMusicDock" class="persistent-music-dock" aria-live="polite">
+    <button type="button" id="persistentMusicToggle" class="persistent-music-toggle" aria-label="播放">
+        <i class="am-icon-play"></i>
+    </button>
+    <img id="persistentMusicCover" class="persistent-music-cover" src="" alt="">
+    <div class="persistent-music-body">
+        <div id="persistentMusicTitle" class="persistent-music-title">Mongona Radio</div>
+        <div id="persistentMusicMeta" class="persistent-music-meta">等待播放</div>
+        <div class="persistent-music-progress" id="persistentMusicProgress">
+            <span id="persistentMusicProgressBar"></span>
+        </div>
+    </div>
+    <button type="button" id="persistentMusicNext" class="persistent-music-next" aria-label="随机换一首">
+        <i class="am-icon-random"></i>
+    </button>
+    <audio id="persistentMusicAudio" preload="metadata"></audio>
+</div>
+<script>
+window.MongonaMusic = window.MongonaMusic || (function (window, document) {
+    var storageKey = 'mongona_music_state_v1';
+    var dock = document.getElementById('persistentMusicDock');
+    var audio = document.getElementById('persistentMusicAudio');
+    var toggle = document.getElementById('persistentMusicToggle');
+    var next = document.getElementById('persistentMusicNext');
+    var cover = document.getElementById('persistentMusicCover');
+    var title = document.getElementById('persistentMusicTitle');
+    var meta = document.getElementById('persistentMusicMeta');
+    var progress = document.getElementById('persistentMusicProgress');
+    var progressBar = document.getElementById('persistentMusicProgressBar');
+    var externalAudio = null;
+    var externalPlayer = null;
+    var externalSourceId = '';
+    var externalCleanup = [];
+    var saveTimer = null;
+    var syncTimer = null;
+    var state = loadState();
+
+    function loadState() {
+        try {
+            return JSON.parse(window.localStorage.getItem(storageKey) || '{}') || {};
+        } catch (err) {
+            return {};
+        }
+    }
+
+    function normalizeTrack(track) {
+        var url;
+        var pic;
+        var lrc;
+        track = track || {};
+        url = track.mp3_url || track.url || '';
+        pic = track.images || track.pic || '';
+        lrc = track.format_lrc || track.lrc_lines || [];
+        if (typeof lrc === 'string') {
+            lrc = lrc.split(/\r?\n/);
+        }
+        return {
+            title: track.title || track.name || 'Mongona Radio',
+            author: track.author || track.artist || 'Random Music',
+            url: url,
+            mp3_url: url,
+            pic: pic,
+            images: pic,
+            nickname: track.nickname || track.comment_nickname || '',
+            comment_nickname: track.comment_nickname || track.nickname || '',
+            comment_content: track.comment_content || track.comment || '',
+            comment_pub_date: track.comment_pub_date || '',
+            format_lrc: Array.isArray(lrc) ? lrc : []
+        };
+    }
+
+    function sameTrack(left, right) {
+        left = normalizeTrack(left);
+        right = normalizeTrack(right);
+        return !!left.url && left.url === right.url;
+    }
+
+    function seekAudio(target, seconds) {
+        seconds = Number(seconds || 0);
+        if (!target || !seconds) {
+            return;
+        }
+        function seek() {
+            try {
+                target.currentTime = seconds;
+            } catch (err) {}
+        }
+        if (target.readyState > 0) {
+            seek();
+            return;
+        }
+        target.addEventListener('loadedmetadata', function onMetadata() {
+            target.removeEventListener('loadedmetadata', onMetadata);
+            seek();
+        });
+    }
+
+    function activeAudio() {
+        if (externalAudio) {
+            return externalAudio;
+        }
+        return audio;
+    }
+
+    function formatTime(seconds) {
+        seconds = Math.max(0, Math.floor(seconds || 0));
+        var minutes = Math.floor(seconds / 60);
+        var rest = seconds % 60;
+        return minutes + ':' + (rest < 10 ? '0' : '') + rest;
+    }
+
+    function snapshot() {
+        var current = activeAudio();
+        return {
+            track: normalizeTrack(state.track),
+            currentTime: current.currentTime || state.currentTime || 0,
+            duration: current.duration || state.duration || 0,
+            paused: current.paused,
+            source: current === audio ? 'persistent' : 'page',
+            sourceId: current === audio ? 'persistent' : externalSourceId
+        };
+    }
+
+    function emitSync(immediate) {
+        var detail;
+        window.clearTimeout(syncTimer);
+        if (!immediate) {
+            syncTimer = window.setTimeout(function () {
+                emitSync(true);
+            }, 120);
+            return;
+        }
+        detail = snapshot();
+        try {
+            document.dispatchEvent(new CustomEvent('mongona:music-sync', {detail: detail}));
+        } catch (err) {}
+    }
+
+    function setVisible(visible) {
+        if (!dock) {
+            return;
+        }
+        dock.classList.toggle('is-visible', !!visible);
+        document.body.classList.toggle('has-persistent-music', !!visible);
+    }
+
+    function render(track) {
+        track = normalizeTrack(track || state.track);
+        state.track = track;
+        if (title) {
+            title.textContent = track.title;
+        }
+        if (cover) {
+            if (track.pic) {
+                cover.src = track.pic + (track.pic.indexOf('?') === -1 ? '?param=120y120' : '');
+                cover.alt = track.title + '封面图';
+                cover.style.visibility = 'visible';
+            } else {
+                cover.removeAttribute('src');
+                cover.alt = '';
+                cover.style.visibility = 'hidden';
+            }
+        }
+        setVisible(!!track.url);
+        update();
+        emitSync(true);
+    }
+
+    function save() {
+        var current = activeAudio();
+        if (!state.track || !state.track.url) {
+            return;
+        }
+        state.currentTime = current.currentTime || 0;
+        state.duration = current.duration || 0;
+        state.paused = current.paused;
+        state.updatedAt = Date.now();
+        try {
+            window.localStorage.setItem(storageKey, JSON.stringify(state));
+        } catch (err) {}
+    }
+
+    function update() {
+        var current = activeAudio();
+        var duration = current.duration || state.duration || 0;
+        var currentTime = current.currentTime || state.currentTime || 0;
+        var ratio = duration ? Math.min(100, Math.max(0, currentTime / duration * 100)) : 0;
+        if (progressBar) {
+            progressBar.style.width = ratio + '%';
+        }
+        if (toggle) {
+            var icon = toggle.querySelector('i');
+            if (icon) {
+                icon.className = current.paused ? 'am-icon-play' : 'am-icon-pause';
+            }
+            toggle.setAttribute('aria-label', current.paused ? '播放' : '暂停');
+        }
+        if (meta && state.track && state.track.url) {
+            meta.textContent = (state.track.author || 'Random Music') + ' · ' + formatTime(currentTime) + (duration ? ' / ' + formatTime(duration) : '');
+        }
+    }
+
+    function scheduleSave() {
+        window.clearTimeout(saveTimer);
+        saveTimer = window.setTimeout(save, 120);
+    }
+
+    function bindEvents(target) {
+        ['play', 'pause', 'timeupdate', 'loadedmetadata', 'durationchange', 'ended', 'error'].forEach(function (name) {
+            target.addEventListener(name, function () {
+                update();
+                scheduleSave();
+                emitSync(name !== 'timeupdate');
+            });
+        });
+    }
+
+    function cleanupExternal() {
+        externalCleanup.forEach(function (fn) {
+            fn();
+        });
+        externalCleanup = [];
+        externalAudio = null;
+        externalPlayer = null;
+        externalSourceId = '';
+    }
+
+    function playTarget(target, player) {
+        var ret;
+        if (player && typeof player.play === 'function') {
+            ret = player.play();
+            return ret && typeof ret.catch === 'function' ? ret : Promise.resolve(ret);
+        }
+        return target.play();
+    }
+
+    function pauseTarget(target, player) {
+        if (player && typeof player.pause === 'function') {
+            player.pause();
+            return;
+        }
+        target.pause();
+    }
+
+    function adopt(target, track, options) {
+        if (!target) {
+            return;
+        }
+        options = options || {};
+        cleanupExternal();
+        if (audio && !audio.paused) {
+            audio.pause();
+        }
+        externalAudio = target;
+        externalPlayer = options.player || null;
+        externalSourceId = options.sourceId || 'page';
+        state.track = normalizeTrack(track);
+        if (!state.track.url) {
+            state.track.url = target.currentSrc || target.src || '';
+        }
+        bindExternal(target);
+        render(state.track);
+        save();
+        emitSync(true);
+    }
+
+    function bindExternal(target) {
+        ['play', 'pause', 'timeupdate', 'loadedmetadata', 'durationchange', 'ended', 'error'].forEach(function (name) {
+            var handler = function () {
+                update();
+                scheduleSave();
+                emitSync(name !== 'timeupdate');
+            };
+            target.addEventListener(name, handler);
+            externalCleanup.push(function () {
+                target.removeEventListener(name, handler);
+            });
+        });
+    }
+
+    function attachPlayer(player, track, options) {
+        var current;
+        var currentPlayer;
+        var target;
+        var nextTrack;
+        var currentTime;
+        var shouldPlay;
+        options = options || {};
+        if (!player || !player.audio) {
+            return Promise.resolve(false);
+        }
+        target = player.audio;
+        current = activeAudio();
+        nextTrack = normalizeTrack(track && (track.url || track.mp3_url) ? track : state.track || track);
+        if (!nextTrack.url) {
+            return Promise.resolve(false);
+        }
+        shouldPlay = options.autoplay === true ||
+            (options.autoplay !== false && current && !current.paused && sameTrack(nextTrack, state.track));
+        currentTime = sameTrack(nextTrack, state.track) ? (current.currentTime || state.currentTime || 0) : Number(options.currentTime || 0);
+        currentPlayer = current === externalAudio ? externalPlayer : null;
+        cleanupExternal();
+        if (current && current !== target) {
+            try {
+                target.volume = current.volume;
+            } catch (err) {}
+            try {
+                pauseTarget(current, currentPlayer);
+            } catch (err) {}
+        }
+        state.track = nextTrack;
+        if ((target.currentSrc || target.src) !== nextTrack.url) {
+            target.src = nextTrack.url;
+        }
+        externalAudio = target;
+        externalPlayer = player;
+        externalSourceId = options.sourceId || 'page';
+        bindExternal(target);
+        render(state.track);
+        seekAudio(target, currentTime);
+        save();
+        emitSync(true);
+        if (shouldPlay) {
+            return playTarget(target, player).catch(function (err) {
+                update();
+                return Promise.reject(err);
+            });
+        }
+        update();
+        return Promise.resolve(true);
+    }
+
+    function playPersistentTrack(track, options) {
+        var current = activeAudio();
+        var currentPlayer = current === externalAudio ? externalPlayer : null;
+        options = options || {};
+        cleanupExternal();
+        if (current && current !== audio) {
+            try {
+                pauseTarget(current, currentPlayer);
+            } catch (err) {}
+        }
+        state.track = normalizeTrack(track);
+        if (!state.track.url) {
+            render(state.track);
+            return Promise.reject(new Error('missing music url'));
+        }
+        if (audio.src !== state.track.url) {
+            audio.src = state.track.url;
+        }
+        render(state.track);
+        if (options.currentTime) {
+            seekAudio(audio, options.currentTime);
+        }
+        save();
+        if (options.autoplay !== false) {
+            return audio.play().catch(function (err) {
+                update();
+                return Promise.reject(err);
+            });
+        }
+        update();
+        return Promise.resolve();
+    }
+
+    function playTrack(track, options) {
+        var normalized = normalizeTrack(track);
+        options = options || {};
+        if (options.preferPage !== false && typeof window.MongonaPagePlayTrack === 'function') {
+            try {
+                return Promise.resolve(window.MongonaPagePlayTrack(normalized, options)).then(function (handled) {
+                    if (handled !== false) {
+                        return handled;
+                    }
+                    return playPersistentTrack(normalized, options);
+                });
+            } catch (err) {
+                if (window.console) {
+                    console.warn(err);
+                }
+            }
+        }
+        return playPersistentTrack(normalized, options);
+    }
+
+    function handoffToPersistent() {
+        var source = activeAudio();
+        var sourcePlayer = source === externalAudio ? externalPlayer : null;
+        if (source === audio || !state.track || !state.track.url) {
+            return;
+        }
+        var currentTime = source.currentTime || 0;
+        var shouldPlay = !source.paused && !source.ended;
+        try {
+            audio.volume = source.volume;
+        } catch (err) {}
+        cleanupExternal();
+        try {
+            pauseTarget(source, sourcePlayer);
+        } catch (err) {}
+        playPersistentTrack(state.track, {autoplay: shouldPlay, currentTime: currentTime}).catch(function () {});
+    }
+
+    function togglePlay() {
+        var current = activeAudio();
+        if (!state.track || !state.track.url) {
+            nextRandom();
+            return;
+        }
+        if (current.paused) {
+            if (current === audio && typeof window.MongonaPagePlayTrack === 'function') {
+                playTrack(state.track, {
+                    autoplay: true,
+                    currentTime: current.currentTime || state.currentTime || 0
+                }).catch(function () {});
+                return;
+            }
+            playTarget(current, current === externalAudio ? externalPlayer : null).catch(function () {});
+        } else {
+            pauseTarget(current, current === externalAudio ? externalPlayer : null);
+        }
+    }
+
+    function nextRandom() {
+        if (!window.fetch) {
+            return Promise.reject(new Error('fetch unavailable'));
+        }
+        if (next) {
+            next.disabled = true;
+        }
+        return window.fetch('/api/random-music/', {
+            credentials: 'same-origin',
+            headers: {'X-Requested-With': 'XMLHttpRequest'}
+        }).then(function (res) {
+            return res.json();
+        }).then(function (res) {
+            if (!res || res.code !== 0 || !res.data) {
+                throw new Error('random music unavailable');
+            }
+            return playTrack(res.data, {autoplay: true});
+        }).catch(function (err) {
+            if (window.console) {
+                console.warn(err);
+            }
+        }).then(function () {
+            if (next) {
+                next.disabled = false;
+            }
+        });
+    }
+
+    bindEvents(audio);
+    if (toggle) {
+        toggle.addEventListener('click', togglePlay);
+    }
+    if (next) {
+        next.addEventListener('click', nextRandom);
+    }
+    if (progress) {
+        progress.addEventListener('click', function (event) {
+            var current = activeAudio();
+            var rect = progress.getBoundingClientRect();
+            var duration = current.duration || 0;
+            if (!duration || !rect.width) {
+                return;
+            }
+            current.currentTime = duration * Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width));
+            update();
+            save();
+            emitSync(true);
+        });
+    }
+    window.addEventListener('beforeunload', save);
+    document.addEventListener('visibilitychange', save);
+
+    if (state.track && state.track.url) {
+        audio.src = state.track.url;
+        render(state.track);
+        if (state.currentTime) {
+            audio.addEventListener('loadedmetadata', function restoreTime() {
+                audio.removeEventListener('loadedmetadata', restoreTime);
+                try {
+                    audio.currentTime = state.currentTime;
+                } catch (err) {}
+                update();
+            });
+        }
+        update();
+    }
+
+    return {
+        adopt: adopt,
+        attachPlayer: attachPlayer,
+        handoffToPersistent: handoffToPersistent,
+        isPlaying: function () {
+            return !activeAudio().paused;
+        },
+        nextRandom: nextRandom,
+        playTrack: playTrack,
+        save: save,
+        state: function () {
+            return state;
+        },
+        snapshot: snapshot,
+        update: update
+    };
+}(window, document));
+</script>
+<div id="pjaxPageScripts" data-pjax-page-scripts style="display:none">
+{% block js %}
+{% endblock %}
+</div>
+<script>
+    function runTime() {
+        var d = new Date(), str = '';
+        BirthDay = new Date("December 10,2018");
+        today = new Date();
+        timeold = (today.getTime() - BirthDay.getTime());
+        sectimeold = timeold / 1000;
+        secondsold = Math.floor(sectimeold);
+        msPerDay = 24 * 60 * 60 * 1000;
+        msPerYear = 365 * 24 * 60 * 60 * 1000;
+        e_daysold = timeold / msPerDay;
+        e_yearsold = timeold / msPerYear;
+        daysold = Math.floor(e_daysold);
+        yearsold = Math.floor(e_yearsold);
+        str = daysold + "天";
+        str += d.getHours() + '时';
+        str += d.getMinutes() + '分';
+        str += d.getSeconds() + '秒';
+        return str;
+    }
+    setInterval(function () {
+        $('#run_time').html(runTime())
+    }, 1000);
+    $.get("https://www.tianqiapi.com/api/?version=v6&appid={{ weather_app_id|urlencode }}&appsecret={{ weather_app_secret|urlencode }}", null, function (t) {
+        if (t) {
+            console.log(t);
+            "" === t ? $(".weather-city").text("暂无数据") : ($(".weather-t1").text(t.tem), $(".weather-t2").text(t.humidity), $(".weather-city").text(t.city + "/" + t.wea + "/" + t.win));
+        } else {
+            (".weather-city").text("暂无数据");
+        }
+    }, "JSON");
+</script>
+<script>
+window.MongonaPoem = window.MongonaPoem || (function (window, document, $) {
+    var fallbackPoems = [
+        "山重水复疑无路，柳暗花明又一村。",
+        "长风破浪会有时，直挂云帆济沧海。",
+        "纸上得来终觉浅，绝知此事要躬行。",
+        "会当凌绝顶，一览众山小。",
+        "不畏浮云遮望眼，自缘身在最高层。"
+    ];
+
+    function fallback() {
+        return fallbackPoems[Math.floor(Math.random() * fallbackPoems.length)];
+    }
+
+    function format(result) {
+        var data = result && result.data ? result.data : {};
+        var origin = data.origin || {};
+        var content = data.content || '';
+        var author = origin.author || '';
+        var title = origin.title || '';
+        if (!content) {
+            return '';
+        }
+        if (author || title) {
+            return content + " -- " + [author, title].filter(Boolean).join(" · ");
+        }
+        return content;
+    }
+
+    function setText(text) {
+        var target = document.getElementById('jinrishici-sentence');
+        if (target) {
+            target.textContent = text || fallback();
+        }
+    }
+
+    function refresh() {
+        var target = document.getElementById('jinrishici-sentence');
+        var settled = false;
+        var timer;
+        if (!target) {
+            return;
+        }
+        target.textContent = '正在加载今日诗词....';
+        timer = window.setTimeout(function () {
+            if (!settled) {
+                settled = true;
+                setText(fallback());
+            }
+        }, 3500);
+
+        function done(text) {
+            if (settled) {
+                return;
+            }
+            settled = true;
+            window.clearTimeout(timer);
+            setText(text || fallback());
+        }
+
+        try {
+            if (window.jinrishici && typeof window.jinrishici.load === 'function') {
+                window.jinrishici.load(function (result) {
+                    done(format(result));
+                }, function () {
+                    done(fallback());
+                });
+                return;
+            }
+        } catch (err) {}
+        done(fallback());
+    }
+
+    if ($) {
+        $(refresh);
+        $(document).on('mongona:page-load', refresh);
+    } else if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', refresh);
+    } else {
+        refresh();
+    }
+
+    return {refresh: refresh};
+}(window, document, window.jQuery));
+</script>
+<script type="text/javascript">
+function addCopyright() {
+    var Original = "<br /> 转自：www.mongona.com" + "<br />地址：" +  location.href;
+    if ("function" == typeof window.getSelection) {
+        var c = window.getSelection();
+        if ("Microsoft Internet Explorer" === navigator.appName && navigator.appVersion.match(/MSIE ([\d.]+)/)[1] >= 10 || "Opera" === navigator.appName) {
+            var g = c.getRangeAt(0),
+            h = document.createElement("span");
+            h.appendChild(g.cloneContents());
+            g.insertNode(h);
+            var i = h.innerHTML.replace(/(?:\n|\r\n|\r)/gi, "").replace(/<\s*script[^>]*>[\s\S]*?<\/script>/gim, "").replace(/<\s*style[^>]*>[\s\S]*?<\/style>/gim, "").replace(/<!--.*?-->/gim, "").replace(/<!DOCTYPE.*?>/gi, "");
+            try {
+                document.getElementsByTagName("body")[0].removeChild(h)
+            } catch(f) {
+                h.style.display = "none";
+                h.innerHTML = ""
+            }
+        } else var d = "" + c;
+        var e = document.getElementsByTagName("body")[0],
+        f = document.createElement("div");
+        f.style.position = "absolute";
+        f.style.left = "-99999px";
+        e.appendChild(f);
+        f.innerHTML = d.replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, "$1<br />$2") + "<br />" + Original;
+        c.selectAllChildren(f);
+        setTimeout(function() {
+            e.removeChild(f)
+        },
+        0)
+    } else if ("object" == typeof document.selection.createRange) {
+        event.returnValue = !1;
+        var j = document.selection.createRange().text;
+        window.clipboardData.setData("Text", j + "\n" + Original)
+    }
+}
+document.body.oncopy = addCopyright;
+    </script>
+{% if page_url != '/?c=4' and page_url != '/?c=5' %}
+<script>var pio = new Paul_Pio({
+    "mode": "fixed",
+    "hidden": true,
+    "content": {
+        "welcome": ["欢迎来到小宇宙！", "今天天气不错，一起来玩吧！", "博主每天都有些折腾记录，欢迎前往他的小窝阅读~"],
+        "custom": [
+            {"selector": ".comment-form", "text": "欢迎参与本文评论，别发小广告噢~"},
+            {"selector": ".home-social a:last-child", "text": "在这里可以了解博主的日常噢~"},
+            {"selector": ".post-item a", "type": "read"},
+            {"selector": ".post-content a, .page-content a", "type": "link"}
+        ]
+    },
+    "night": "single.night()",
+    "model": ["https://cdn.mongona.com/live2d-widget-model-epsilon2_1/assets/Epsilon2.1.model.json"]
+});
+var pioReadyStage = document.querySelector(".pio-container.codex-pio-stage");
+if (pioReadyStage) {
+    pioReadyStage.setAttribute("data-pio-ready", "1");
+}</script>
+<script>
+(function () {
+    var stage = document.querySelector(".pio-container.codex-pio-stage");
+    if (!stage) {
+        return;
+    }
+    if (stage.getAttribute("data-pio-bound") === "1") {
+        return;
+    }
+    stage.setAttribute("data-pio-bound", "1");
+
+    var wakeTimer;
+
+    function wakeStage() {
+        stage.classList.add("is-pio-awake");
+        clearTimeout(wakeTimer);
+        wakeTimer = setTimeout(function () {
+            stage.classList.remove("is-pio-awake");
+        }, 1600);
+    }
+
+    stage.addEventListener("mouseover", wakeStage);
+    stage.addEventListener("touchstart", wakeStage, {passive: true});
+    stage.addEventListener("click", function () {
+        wakeStage();
+    });
+}());
+</script>
+{% endif %}
+
+<script>
+// Codex mobile topbar close fix
+(function () {
+    function closeTopbar() {
+        var topbar = $("#doc-topbar-collapse");
+        topbar.removeClass("am-in am-collapsing").removeAttr("style");
+    }
+
+    $(function () {
+        var topbar = $("#doc-topbar-collapse");
+        var toggle = $(".am-topbar-toggle");
+
+        toggle.on("touchstart mousedown", function () {
+            $(this).data("was-open", topbar.hasClass("am-in"));
+        });
+
+        toggle.on("click", function () {
+            if ($(this).data("was-open") === true) {
+                window.setTimeout(closeTopbar, 60);
+            }
+        });
+
+        topbar.find(".am-topbar-nav a").on("click", function () {
+            if (window.innerWidth <= 640) {
+                closeTopbar();
+            }
+        });
+
+        $(document).on("click", function (event) {
+            if (window.innerWidth > 640 || !topbar.hasClass("am-in")) {
+                return;
+            }
+            if ($(event.target).closest(".am-topbar").length === 0) {
+                closeTopbar();
+            }
+        });
+    });
+}());
+</script>
+<script>
+window.MongonaPjax = window.MongonaPjax || (function (window, document, $) {
+    if (!window.fetch || !window.history || !window.DOMParser) {
+        return null;
+    }
+
+    var loadingClass = 'is-pjax-loading';
+    var navigating = false;
+
+    function sameOrigin(url) {
+        return url.origin === window.location.origin;
+    }
+
+    function topbarOffset() {
+        var topbar = document.querySelector('.am-topbar-fixed-top') || document.querySelector('.am-topbar');
+        return (topbar ? topbar.offsetHeight : 0) + 12;
+    }
+
+    function instantScrollTo(top) {
+        var html = document.documentElement;
+        var body = document.body;
+        var previousHtmlBehavior = html.style.scrollBehavior;
+        var previousBodyBehavior = body ? body.style.scrollBehavior : '';
+
+        html.style.scrollBehavior = 'auto';
+        if (body) {
+            body.style.scrollBehavior = 'auto';
+        }
+        try {
+            window.scrollTo({top: Math.max(0, top || 0), left: 0, behavior: 'auto'});
+        } catch (err) {
+            window.scrollTo(0, Math.max(0, top || 0));
+        }
+        window.setTimeout(function () {
+            html.style.scrollBehavior = previousHtmlBehavior;
+            if (body) {
+                body.style.scrollBehavior = previousBodyBehavior;
+            }
+        }, 0);
+    }
+
+    function scrollToHash(hash, smooth) {
+        var target;
+        var top;
+        if (!hash) {
+            instantScrollTo(0);
+            return;
+        }
+        try {
+            target = document.getElementById(decodeURIComponent(hash.slice(1)));
+        } catch (err) {
+            target = document.getElementById(hash.slice(1));
+        }
+        if (!target) {
+            instantScrollTo(0);
+            return;
+        }
+        window.setTimeout(function () {
+            top = Math.max(0, target.getBoundingClientRect().top + window.pageYOffset - topbarOffset());
+            if (smooth === true) {
+                try {
+                    window.scrollTo({top: top, behavior: 'smooth'});
+                } catch (err) {
+                    instantScrollTo(top);
+                }
+                return;
+            }
+            instantScrollTo(top);
+        }, 40);
+    }
+
+    function scrollToUrl(url, smooth) {
+        if (url && url.hash) {
+            scrollToHash(url.hash, smooth);
+            return;
+        }
+        instantScrollTo(0);
+    }
+
+    function samePageHashUrl(link, event) {
+        var href;
+        var url;
+        if (!link || event.defaultPrevented || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+            return null;
+        }
+        if (link.target && link.target !== '_self') {
+            return null;
+        }
+        if (link.hasAttribute('download')) {
+            return null;
+        }
+        href = link.getAttribute('href') || '';
+        if (!href || href.indexOf('javascript:') === 0 || href.indexOf('mailto:') === 0 || href.indexOf('tel:') === 0) {
+            return null;
+        }
+        url = new URL(href, window.location.href);
+        if (!sameOrigin(url) || !url.hash) {
+            return null;
+        }
+        if (url.pathname === window.location.pathname && url.search === window.location.search) {
+            return url;
+        }
+        return null;
+    }
+
+    function shouldSkipLink(link, event) {
+        var href;
+        var url;
+        if (!link || event.defaultPrevented || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+            return true;
+        }
+        if (link.target && link.target !== '_self') {
+            return true;
+        }
+        if (link.hasAttribute('download')) {
+            return true;
+        }
+        href = link.getAttribute('href') || '';
+        if (!href || href.indexOf('javascript:') === 0 || href.indexOf('mailto:') === 0 || href.indexOf('tel:') === 0) {
+            return true;
+        }
+        url = new URL(href, window.location.href);
+        if (!sameOrigin(url)) {
+            return true;
+        }
+        if (url.pathname === window.location.pathname && url.search === window.location.search && url.hash) {
+            return true;
+        }
+        if (/\.(?:jpg|jpeg|png|gif|webp|svg|mp3|flac|wav|ogg|mp4|mov|avi|zip|rar|7z|pdf)$/i.test(url.pathname)) {
+            return true;
+        }
+        return /^(?:\/api\/|\/admin\/|\/ckeditor\/|\/media\/|\/static\/|\/cdn\/|\/digg\/|\/duanzi\/)/.test(url.pathname);
+    }
+
+    function closeTopbar() {
+        var topbar = document.getElementById('doc-topbar-collapse');
+        if (topbar) {
+            topbar.classList.remove('am-in', 'am-collapsing');
+            topbar.removeAttribute('style');
+        }
+    }
+
+    function prepareCurrentPage() {
+        if (window.MongonaMusic && typeof window.MongonaMusic.handoffToPersistent === 'function') {
+            window.MongonaMusic.handoffToPersistent();
+        }
+        if (typeof window.MongonaPageCleanup === 'function') {
+            try {
+                window.MongonaPageCleanup();
+            } catch (err) {
+                if (window.console) {
+                    console.warn(err);
+                }
+            }
+            window.MongonaPageCleanup = null;
+        }
+        if ($) {
+            $(window).off('.galleryMusic').off('.musicCanvas');
+        }
+    }
+
+    function hasStylesheet(href) {
+        return Array.prototype.some.call(document.querySelectorAll('link[rel="stylesheet"]'), function (link) {
+            return link.href === href;
+        });
+    }
+
+    function hasScript(src) {
+        return Array.prototype.some.call(document.scripts, function (script) {
+            return script.src === src;
+        });
+    }
+
+    function syncHeadAssets(newDoc) {
+        var headScripts;
+        var freshStylesheets = {};
+        Array.prototype.forEach.call(newDoc.querySelectorAll('head link[rel="stylesheet"]'), function (link) {
+            if (link.href) {
+                freshStylesheets[link.href] = true;
+            }
+        });
+        Array.prototype.forEach.call(document.querySelectorAll('head link[rel="stylesheet"][data-pjax-dynamic="1"]'), function (link) {
+            if (!freshStylesheets[link.href] && link.parentNode) {
+                link.parentNode.removeChild(link);
+            }
+        });
+        Array.prototype.forEach.call(newDoc.querySelectorAll('head link[rel="stylesheet"]'), function (link) {
+            if (!link.href || hasStylesheet(link.href)) {
+                return;
+            }
+            var clone = link.cloneNode(true);
+            clone.setAttribute('data-pjax-dynamic', '1');
+            document.head.appendChild(clone);
+        });
+        var freshStyleKeys = {};
+        Array.prototype.forEach.call(newDoc.querySelectorAll('head style'), function (style) {
+            var text = style.textContent || '';
+            var key = (String(text.length) + ':' + text.slice(0, 90)).replace(/[^a-zA-Z0-9:_-]/g, '');
+            freshStyleKeys[key] = true;
+        });
+        Array.prototype.forEach.call(document.querySelectorAll('head style[data-pjax-style]'), function (style) {
+            var key = style.getAttribute('data-pjax-style');
+            if (!freshStyleKeys[key] && style.parentNode) {
+                style.parentNode.removeChild(style);
+            }
+        });
+        Array.prototype.forEach.call(newDoc.querySelectorAll('head style'), function (style) {
+            var text = style.textContent || '';
+            var key = (String(text.length) + ':' + text.slice(0, 90)).replace(/[^a-zA-Z0-9:_-]/g, '');
+            if (document.querySelector('style[data-pjax-style="' + key + '"]')) {
+                return;
+            }
+            var clone = style.cloneNode(true);
+            clone.setAttribute('data-pjax-style', key);
+            document.head.appendChild(clone);
+        });
+        headScripts = Array.prototype.slice.call(newDoc.querySelectorAll('head script[src]'));
+        return headScripts.reduce(function (chain, script) {
+            return chain.then(function () {
+                return loadScript(script);
+            });
+        }, Promise.resolve());
+    }
+
+    function syncNav(newDoc) {
+        var currentItems = document.querySelectorAll('.am-topbar-nav > li');
+        var freshItems = newDoc.querySelectorAll('.am-topbar-nav > li');
+        Array.prototype.forEach.call(currentItems, function (item, index) {
+            if (freshItems[index]) {
+                item.className = freshItems[index].className;
+            }
+        });
+        closeTopbar();
+    }
+
+    function syncTopImage(newDoc) {
+        var currentTop = document.getElementById('siteTopImage');
+        var freshTop = newDoc.getElementById('siteTopImage');
+        if (currentTop && freshTop) {
+            currentTop.innerHTML = freshTop.innerHTML;
+        }
+    }
+
+    function createCleanPioStage() {
+        var stage = document.createElement('div');
+        stage.className = 'pio-container codex-pio-stage';
+        stage.innerHTML = '<div class="pio-action"></div><canvas id="pio" width="280" height="250"></canvas>';
+        return stage;
+    }
+
+    function hidePioStage(stage) {
+        if (!stage) {
+            return;
+        }
+        stage.classList.add('is-pio-suspended');
+        stage.setAttribute('aria-hidden', 'true');
+    }
+
+    function showPioStage(stage) {
+        if (!stage) {
+            return;
+        }
+        stage.classList.remove('is-pio-suspended');
+        stage.removeAttribute('aria-hidden');
+    }
+
+    function syncPageDecorations(newDoc) {
+        var currentPio = document.querySelector('.pio-container.codex-pio-stage');
+        var freshPio = newDoc.querySelector('.pio-container.codex-pio-stage');
+        var footerTop = document.querySelector('.footer-top');
+        var clone;
+        if (currentPio && !freshPio) {
+            hidePioStage(currentPio);
+            return;
+        }
+        if (currentPio && freshPio) {
+            showPioStage(currentPio);
+            retryBootPioStage(3);
+            return;
+        }
+        if (!currentPio && freshPio) {
+            clone = createCleanPioStage();
+            if (footerTop && footerTop.parentNode) {
+                footerTop.parentNode.insertBefore(clone, footerTop);
+            } else {
+                document.body.appendChild(clone);
+            }
+            showPioStage(clone);
+            retryBootPioStage(12);
+            return;
+        }
+        retryBootPioStage(3);
+    }
+
+    function pioConfig() {
+        return {
+            "mode": "fixed",
+            "hidden": true,
+            "content": {
+                "welcome": ["欢迎来到小宇宙！", "今天天气不错，一起来玩吧！", "博主每天都有些折腾记录，欢迎前往他的小窝阅读~"],
+                "custom": [
+                    {"selector": ".comment-form", "text": "欢迎参与本文评论，别发小广告噢~"},
+                    {"selector": ".home-social a:last-child", "text": "在这里可以了解博主的日常噢~"},
+                    {"selector": ".post-item a", "type": "read"},
+                    {"selector": ".post-content a, .page-content a", "type": "link"}
+                ]
+            },
+            "night": "single.night()",
+            "model": ["https://cdn.mongona.com/live2d-widget-model-epsilon2_1/assets/Epsilon2.1.model.json"]
+        };
+    }
+
+    function bindPioStage(stage) {
+        var wakeTimer;
+
+        function wakeStage() {
+            stage.classList.add("is-pio-awake");
+            clearTimeout(wakeTimer);
+            wakeTimer = setTimeout(function () {
+                stage.classList.remove("is-pio-awake");
+            }, 1600);
+        }
+
+        if (!stage || stage.getAttribute("data-pio-bound") === "1") {
+            return;
+        }
+        stage.setAttribute("data-pio-bound", "1");
+        stage.addEventListener("mouseover", wakeStage);
+        stage.addEventListener("touchstart", wakeStage, {passive: true});
+        stage.addEventListener("click", function () {
+            wakeStage();
+        });
+    }
+
+    function bootPioStage() {
+        var stage = document.querySelector(".pio-container.codex-pio-stage");
+        if (!stage) {
+            return true;
+        }
+        if (!window.Paul_Pio) {
+            return false;
+        }
+        try {
+            if (!window.pio || stage.getAttribute("data-pio-ready") !== "1") {
+                window.pio = new Paul_Pio(pioConfig());
+                stage.setAttribute("data-pio-ready", "1");
+            }
+            bindPioStage(stage);
+            return true;
+        } catch (err) {
+            if (window.console) {
+                console.warn(err);
+            }
+            return false;
+        }
+    }
+
+    function retryBootPioStage(times) {
+        if (bootPioStage() || times <= 0) {
+            return;
+        }
+        window.setTimeout(function () {
+            retryBootPioStage(times - 1);
+        }, 160);
+    }
+
+    function loadScript(script) {
+        return new Promise(function (resolve, reject) {
+            var clone = document.createElement('script');
+            Array.prototype.forEach.call(script.attributes, function (attr) {
+                clone.setAttribute(attr.name, attr.value);
+            });
+            clone.async = false;
+            if (script.src) {
+                if (hasScript(script.src)) {
+                    resolve();
+                    return;
+                }
+                clone.onload = resolve;
+                clone.onerror = reject;
+                clone.setAttribute('data-pjax-dynamic', '1');
+                document.body.appendChild(clone);
+                return;
+            }
+            clone.text = script.textContent || '';
+            document.body.appendChild(clone);
+            window.setTimeout(resolve, 0);
+        });
+    }
+
+    function runScripts(scripts) {
+        return scripts.reduce(function (chain, script) {
+            return chain.then(function () {
+                return loadScript(script);
+            });
+        }, Promise.resolve());
+    }
+
+    function runContentScripts(container) {
+        var scripts = container ? Array.prototype.slice.call(container.querySelectorAll('script')) : [];
+        scripts.forEach(function (script) {
+            if (script.parentNode) {
+                script.parentNode.removeChild(script);
+            }
+        });
+        return runScripts(scripts);
+    }
+
+    function runPageScripts(newDoc) {
+        var payload = newDoc.getElementById('pjaxPageScripts');
+        var currentPayload = document.getElementById('pjaxPageScripts');
+        var scripts = payload ? Array.prototype.slice.call(payload.querySelectorAll('script')) : [];
+        if (currentPayload) {
+            currentPayload.innerHTML = '';
+        }
+        return runScripts(scripts);
+    }
+
+    function replacePage(html, url, push) {
+        var newDoc = new DOMParser().parseFromString(html, 'text/html');
+        var currentMain = document.getElementById('siteMain');
+        var freshMain = newDoc.getElementById('siteMain');
+        if (!currentMain || !freshMain) {
+            window.location.href = url.href;
+            return Promise.resolve();
+        }
+        syncNav(newDoc);
+        syncTopImage(newDoc);
+        syncPageDecorations(newDoc);
+        if (newDoc.title) {
+            document.title = newDoc.title;
+        }
+        return syncHeadAssets(newDoc).then(function () {
+            currentMain.innerHTML = freshMain.innerHTML;
+            if (push) {
+                window.history.pushState({pjax: true}, newDoc.title || '', url.href);
+            }
+            return runContentScripts(currentMain);
+        }).then(function () {
+            return runPageScripts(newDoc);
+        }).then(function () {
+            if ($) {
+                $(document).trigger('mongona:page-load', [url.href]);
+            }
+            retryBootPioStage(5);
+            scrollToUrl(url, false);
+        });
+    }
+
+    function visit(rawUrl, push) {
+        if (navigating) {
+            return;
+        }
+        var url = new URL(rawUrl, window.location.href);
+        navigating = true;
+        document.documentElement.classList.add(loadingClass);
+        prepareCurrentPage();
+        window.fetch(url.href, {
+            credentials: 'same-origin',
+            headers: {'X-Mongona-Pjax': '1'}
+        }).then(function (res) {
+            if (!res.ok) {
+                throw new Error('pjax status ' + res.status);
+            }
+            return res.text();
+        }).then(function (html) {
+            return replacePage(html, url, push);
+        }).catch(function (err) {
+            if (window.console) {
+                console.warn(err);
+            }
+            window.location.href = url.href;
+        }).then(function () {
+            navigating = false;
+            document.documentElement.classList.remove(loadingClass);
+        });
+    }
+
+    document.addEventListener('click', function (event) {
+        var link = event.target.closest ? event.target.closest('a') : null;
+        var hashUrl = samePageHashUrl(link, event);
+        if (hashUrl) {
+            event.preventDefault();
+            if (window.history && window.history.pushState) {
+                window.history.pushState({pjax: true}, '', hashUrl.href);
+            }
+            closeTopbar();
+            scrollToHash(hashUrl.hash, false);
+            return;
+        }
+        if (shouldSkipLink(link, event)) {
+            return;
+        }
+        event.preventDefault();
+        visit(link.href, true);
+    });
+
+    document.addEventListener('submit', function (event) {
+        var form = event.target;
+        var url;
+        if (!form || form.tagName !== 'FORM' || (form.method || 'get').toLowerCase() !== 'get') {
+            return;
+        }
+        url = new URL(form.action || window.location.href, window.location.href);
+        if (!sameOrigin(url)) {
+            return;
+        }
+        event.preventDefault();
+        url.search = new URLSearchParams(new FormData(form)).toString();
+        visit(url.href, true);
+    });
+
+    window.addEventListener('popstate', function () {
+        visit(window.location.href, false);
+    });
+
+    return {visit: visit};
+}(window, document, window.jQuery));
+</script>
+<script>
+(function (window, document, $) {
+    var storagePrefix = 'mongona:sponsor-ad-dismissed:';
+
+    function each(list, callback) {
+        Array.prototype.forEach.call(list || [], callback);
+    }
+
+    function key(id) {
+        return storagePrefix + id;
+    }
+
+    function isDismissed(id) {
+        try {
+            return window.localStorage.getItem(key(id)) === '1';
+        } catch (err) {
+            return false;
+        }
+    }
+
+    function saveDismissed(id) {
+        try {
+            window.localStorage.setItem(key(id), '1');
+        } catch (err) {}
+    }
+
+    function reportSponsorAdEvent(id, eventName) {
+        var data;
+        if (!id || !eventName) {
+            return;
+        }
+        data = new FormData();
+        data.append('ad_id', id);
+        data.append('event', eventName);
+        data.append('path', window.location.pathname + window.location.search);
+        if (window.navigator && typeof window.navigator.sendBeacon === 'function') {
+            try {
+                if (window.navigator.sendBeacon('/api/sponsor-ad-event/', data)) {
+                    return;
+                }
+            } catch (err) {}
+        }
+        if (window.fetch) {
+            window.fetch('/api/sponsor-ad-event/', {
+                method: 'POST',
+                body: data,
+                credentials: 'same-origin',
+                headers: {'X-Requested-With': 'XMLHttpRequest'},
+                keepalive: true
+            }).catch(function () {});
+        }
+    }
+
+    function reportImpression(item, id) {
+        if (!item || !id || item.classList.contains('is-dismissed')) {
+            return;
+        }
+        if (item.getAttribute('data-sponsor-impression-sent') === '1') {
+            return;
+        }
+        item.setAttribute('data-sponsor-impression-sent', '1');
+        reportSponsorAdEvent(id, 'impression');
+    }
+
+    function syncSidebarPanels(root) {
+        each((root || document).querySelectorAll('.codex-sponsor-mini'), function (panel) {
+            var items = panel.querySelectorAll('[data-sponsor-ad-id]');
+            var visibleCount = 0;
+            each(items, function (item) {
+                if (!item.classList.contains('is-dismissed')) {
+                    visibleCount += 1;
+                }
+            });
+            if (items.length && visibleCount === 0) {
+                panel.classList.add('is-sponsor-empty');
+            } else {
+                panel.classList.remove('is-sponsor-empty');
+            }
+        });
+    }
+
+    function applyDismissed(scope) {
+        var root = scope && scope.querySelectorAll ? scope : document;
+        each(root.querySelectorAll('[data-sponsor-ad-id]'), function (item) {
+            var id = item.getAttribute('data-sponsor-ad-id');
+            if (id && isDismissed(id)) {
+                item.classList.add('is-dismissed');
+            } else if (id) {
+                reportImpression(item, id);
+            }
+        });
+        syncSidebarPanels(document);
+    }
+
+    document.addEventListener('click', function (event) {
+        var button = event.target.closest ? event.target.closest('.sponsor-ad-close') : null;
+        var item;
+        var id;
+        if (!button) {
+            return;
+        }
+        event.preventDefault();
+        event.stopPropagation();
+        item = button.closest('[data-sponsor-ad-id]');
+        if (!item) {
+            return;
+        }
+        id = item.getAttribute('data-sponsor-ad-id');
+        if (id) {
+            saveDismissed(id);
+            reportSponsorAdEvent(id, 'dismiss');
+        }
+        item.classList.add('is-dismissed');
+        syncSidebarPanels(document);
+    });
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function () {
+            applyDismissed(document);
+        });
+    } else {
+        applyDismissed(document);
+    }
+    if ($) {
+        $(document).on('mongona:page-load', function () {
+            applyDismissed(document);
+        });
+    }
+}(window, document, window.jQuery));
+</script>
+</body>
+</html>

@@ -1,0 +1,525 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load mytags %}
+{% block site_title %}{{ article.article_title }} | {{ siteinfo.site_name }} {% endblock %}
+{% block meta_keywords %}{% if article.article_tag %}{{ article.article_tag }}{% else %}Python,Django,Go,Linux,AI,技术博客{% endif %}{% endblock %}
+{% block meta_description %}{{ seo_description|default:article.article_synopsis|striptags|truncatechars:155 }}{% endblock %}
+{% block css %}
+    <link href="{% static 'highlight/styles/default.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.mongona.com/static/css/style.css?v=20260624reward1">
+    <style>
+        .article-main .page-reward {
+            grid-template-columns: minmax(0, 1fr) auto !important;
+        }
+
+        .article-main .page-reward::before,
+        .article-main .page-reward::after {
+            display: none !important;
+            content: none !important;
+        }
+
+        .article-main .page-reward-copy {
+            grid-column: 1 !important;
+            display: flex !important;
+            min-width: 0 !important;
+            flex-direction: column !important;
+            gap: 6px !important;
+            text-align: left !important;
+        }
+
+        .article-main .page-reward-copy strong {
+            display: block !important;
+            color: var(--apple-text, #1d1d1f) !important;
+            font-size: 2rem !important;
+            font-weight: 800 !important;
+            line-height: 1.25 !important;
+        }
+
+        .article-main .page-reward-copy span {
+            display: block !important;
+            color: var(--apple-sub, #6e6e73) !important;
+            font-size: 1.28rem !important;
+            line-height: 1.6 !important;
+        }
+
+        .article-main .page-reward-btn {
+            flex: 0 0 auto !important;
+            grid-row: 1 !important;
+            grid-column: 2 !important;
+            align-self: center !important;
+            justify-self: end !important;
+            color: #fff !important;
+            background: var(--apple-blue, #0071e3) !important;
+        }
+
+        .reward-subtitle {
+            margin: -6px 22px 14px !important;
+            color: var(--apple-sub, #6e6e73) !important;
+            font-size: 1.28rem !important;
+            line-height: 1.6 !important;
+            text-align: center !important;
+        }
+
+        @media only screen and (max-width: 640px) {
+            .article-main .page-reward {
+                grid-template-columns: 1fr !important;
+            }
+
+            .article-main .page-reward-copy {
+                text-align: center !important;
+            }
+
+            .article-main .page-reward-btn {
+                grid-row: auto !important;
+                grid-column: 1 !important;
+                justify-self: center !important;
+            }
+        }
+    </style>
+{% endblock css %}
+{% block article %}
+    <article class="article-main">
+        <h4 class="am-article-title blog-title">
+            {% if article.article_original == '1' %}
+                <button type="button" class="am-btn am-btn-success am-round am-btn-xs" title="本文为作者原创">Origin</button>
+            {% endif %}
+            {% if article.article_original == '0' %}
+                <button type="button" class="am-btn am-btn-secondary am-round am-btn-xs" title="本文为转载文章">via</button>
+            {% endif %}
+            <a href="javascript:void(0);">{{ article.article_title }}</a>
+        </h4>
+        <div class="am-article-meta blog-meta" style="padding-bottom:15px; border-bottom: 1px solid #ddd; font-weight: 500;">
+            <a href="/?c=6" class="am-link-muted">{{ article.article_user.user_nick_name }}</a>&nbsp;
+            <span class="am-link-muted"> {{ article.article_create_time }} </span>&nbsp;
+            Hot: <span class="am-text-danger" style="color: #F4655F;">{{ article.article_click }} ℃</span>
+        </div>
+        <div class="blog-content">
+            {% if article.article_image %}
+                <div align="center"><img alt="{{ article.article_title }}" src="{{ MEDIA_URL }}{{ article.article_image }}?imageView2/0/q/75|watermark/2/text/bW9uZ29uYS5jb20=/font/5b6u6L2v6ZuF6buR/fontsize/280/fill/IzAwMDAwMA==/dissolve/100/gravity/SouthEast/dx/10/dy/10|imageslim">
+                </div>
+            {% endif %}
+            {% autoescape off %}
+                {{ article.article_content }}
+            {% endautoescape %}
+            {% with article_ads=sponsor_ads.article_bottom %}
+                {% if article_ads %}
+                    {% for ad in article_ads %}
+                        <section class="growth-conversion-card sponsor-ad-item article-sponsor-card{% if ad.image_url %} article-sponsor-card-image{% endif %}"
+                                 data-sponsor-ad-id="{{ ad.id }}">
+                            <button type="button" class="sponsor-ad-close" aria-label="关闭广告" title="关闭广告">&times;</button>
+                            <div class="article-sponsor-meta">
+                                <div class="article-sponsor-label">Sponsored</div>
+                                <h3>{{ ad.title }}</h3>
+                                <p>{{ ad.description }}</p>
+                            </div>
+                            {% if ad.image_url %}
+                                <a class="article-sponsor-media" href="/go/{{ ad.id }}/" target="_blank" rel="nofollow sponsored noopener">
+                                    <img class="article-sponsor-image" src="{{ ad.image_url }}" alt="{{ ad.title }}">
+                                </a>
+                            {% else %}
+                                <a class="money-button" href="/go/{{ ad.id }}/" target="_blank"
+                                   rel="nofollow sponsored noopener">{{ ad.cta_text }}</a>
+                            {% endif %}
+                        </section>
+                    {% endfor %}
+                {% else %}
+                    {% autoescape off %}
+                        {{ siteinfo.site_changyan }}
+                    {% endautoescape %}
+                {% endif %}
+            {% endwith %}
+
+            <div id="div_digg" class="article-actions">
+
+                <button type="button" class="diggit action" aria-label="点赞">
+                    <span class="action-icon">赞</span>
+                    <span class="diggnum" id="digg_count">{{ article.article_like }}</span>
+                </button>
+
+                <button type="button" class="buryit action" aria-label="踩">
+                    <span class="action-icon">踩</span>
+                    <span class="diggnum" id="bury_count">{{ article.article_down }}</span>
+                </button>
+                <div class="diggword" id="digg_tips"></div>
+            </div>
+            {% csrf_token %}
+            <style>
+                .toast {
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    display: inline-block;
+                    min-width: 80px;
+                    padding: 5px 10px;
+                    font-size: 14px;
+                    color: #fff;
+                    transform: translate(-50%, -50%);
+                    background: rgba(0, 0, 0, .4);
+                    z-index: 1000;
+                    border-radius: 4px;
+                }
+            </style>
+            <div class="am-article-meta blog-meta">
+
+                <p class="am-text-sm am-text-center">Author：<a href="/?c=6"
+                                                               class="am-text-warning">{{ article.article_user.user_nick_name }}</a>
+                    Please give credit to the original author when you use it elsewhere：<a class="am-text-warning "
+                                                                                           href="/blog/{{ article.id }}">https://www.mongona.com/blog/{{ article.id }}</a>
+                </p>
+
+            </div>
+            <nav class="article-nav" aria-label="文章翻页">
+                {% if pa %}
+                    <a class="article-nav-card article-nav-prev" href="/blog/{{ pa.id }}">
+                        <span class="article-nav-label">上一篇</span>
+                        <strong>{{ pa.article_title }}</strong>
+                    </a>
+                {% else %}
+                    <span class="article-nav-card article-nav-empty">
+                        <span class="article-nav-label">上一篇</span>
+                        <strong>已经是第一篇</strong>
+                    </span>
+                {% endif %}
+                {% if na %}
+                    <a class="article-nav-card article-nav-next" href="/blog/{{ na.id }}">
+                        <span class="article-nav-label">下一篇</span>
+                        <strong>{{ na.article_title }}</strong>
+                    </a>
+                {% else %}
+                    <span class="article-nav-card article-nav-empty">
+                        <span class="article-nav-label">下一篇</span>
+                        <strong>已经是最后一篇</strong>
+                    </span>
+                {% endif %}
+            </nav>
+            {% if related_articles %}
+                <div class="am-panel am-panel-default blog-tag">
+                    <div class="am-panel-hd">相关推荐</div>
+                    <div class="am-panel-bd">
+                        <ul class="am-list am-list-border">
+                            {% for item in related_articles %}
+                                <li><a class="am-link-muted am-text-truncate" href="/blog/{{ item.id }}">{{ item.article_title }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            {% endif %}
+            {% if recommended_tools %}
+                <div class="am-panel am-panel-default blog-tag">
+                    <div class="am-panel-hd">开发者工具</div>
+                    <div class="am-panel-bd">
+                        {% for tool in recommended_tools %}
+                            <a href="/tools/{{ tool.slug }}/" class="am-badge am-badge-secondary">{{ tool.name }}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+            {% if tags %}
+                <div class="am-panel am-panel-default blog-tag">
+                    <div class="am-panel-hd">Tags</div>
+                    <div class="am-panel-bd">
+                        {% for tag in tags %}
+                            <a href="/tag/{{ tag|urlencode }}/" class="am-badge am-badge-success">{{ tag }}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+            <div id="reward"  class="page-modal reward-lay">
+                <a class="close" href="javascript:"><i class="icon icon-close"></i></a>
+                <h5 class="reward-title">
+                    请我喝咖啡
+                </h5>
+                <p class="reward-subtitle">感谢支持，我会继续更新更有用的技术内容。</p>
+                <div class="reward-content">
+
+                    <div class="reward-code">
+                        <img id="rewardCode" src="https://cdn.mongona.com/static/images/wechat.jpg" alt="打赏二维码">
+                    </div>
+
+                    <label class="reward-toggle">
+                        <input id="rewardToggle" type="checkbox" class="reward-toggle-check"
+                               data-wechat="https://cdn.mongona.com/static/images/wechat.jpg"
+                               data-alipay="https://cdn.mongona.com/static/images/alipay.jpg">
+                        <div class="reward-toggle-ctrol">
+                            <span class="reward-toggle-item wechat">微信</span>
+                            <span class="reward-toggle-label"></span>
+                            <span class="reward-toggle-item alipay">支付宝</span>
+                        </div>
+                    </label>
+
+                </div>
+            </div>
+            <div id="rewardBackdrop" class="reward-backdrop"></div>
+            <div class="page-reward">
+                <div class="page-reward-copy">
+                    <strong>请我喝咖啡</strong>
+                    <span>如果内容帮到了你，可以赞赏支持继续更新。</span>
+                </div>
+                <a id="rewardBtn" href="javascript:"
+                   class="page-reward-btn waves-effect waves-circle waves-light">赏</a>
+            </div>
+            <div class="post-footer">
+                <div class="page-share-wrap">
+                    <div class="page-share" id="pageShare">
+                        <ul class="reset share-icons">
+                            <li>
+                                <a class="weibo share-sns" target="_blank"
+                                   href="http://service.weibo.com/share/share.php?url=https://www.mongona.com/blog/{{ article.id }}&amp;title={{ article.article_synopsis }}&amp;pic=https://cdn.mongona.com/upload/image/user/2019/03/170157_AOda_1767531.jpg"
+                                   data-title="微博">
+                                    <i class="icon icon-weibo"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="qq share-sns" target="_blank"
+                                   href="http://connect.qq.com/widget/shareqq/index.html?url=https://www.mongona.com/blog/{{ article.id }}&amp;title={{ article.article_synopsis }}| {{ siteinfo.site_name }}&amp;source=https://cdn.mongona.com/upload/image/user/2019/03/170157_AOda_1767531.jpg"
+                                   data-title=" QQ">
+                                    <i class="icon icon-qq"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="facebook share-sns" target="_blank"
+                                   href="https://www.facebook.com/sharer/sharer.php?u=https://www.mongona.com/blog/{{ article.id }}"
+                                   data-title=" Facebook">
+                                    <i class="icon icon-facebook"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="twitter share-sns" target="_blank"
+                                   href="https://twitter.com/intent/tweet?text={{ article.article_synopsis }} | {{ siteinfo.site_name }}&amp;url=https://www.mongona.com/blog/{{ article.id }}&amp;via=https://www.mongona.com"
+                                   data-title=" Twitter">
+                                    <i class="icon icon-twitter"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="google share-sns" target="_blank"
+                                   href="https://plus.google.com/share?url=https://www.mongona.com/blog/{{ article.id }}"
+                                   data-title=" Google+">
+                                    <i class="icon icon-google-plus"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <a href="javascript:" id="shareFab" class="page-share-fab waves-effect waves-circle">
+                        <i class="icon icon-share-alt icon-lg"></i>
+                    </a>
+                </div>
+
+
+            </div>
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+            <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+            <div id="gitalk-container"></div>
+
+    </article>
+{% endblock %}
+{% block js %}
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": "{{ article.article_title|escapejs }}",
+        "description": "{{ seo_description|escapejs }}",
+        "url": "{{ canonical_url|escapejs }}",
+        "datePublished": "{{ article.article_create_time|date:"c" }}",
+        "dateModified": "{{ article.article_update_time|date:"c" }}",
+        "isAccessibleForFree": true,
+        "keywords": "{{ article.article_tag|default:"Python,Django,Go,Linux,AI"|escapejs }}",
+        {% if article.article_category %}"articleSection": "{{ article.article_category.category_name|escapejs }}",{% endif %}
+        "author": {
+            "@type": "Person",
+            "name": "{{ article.article_user.user_nick_name|escapejs }}"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "{{ siteinfo.site_name|escapejs }}"
+        },
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "{{ canonical_url|escapejs }}"
+        }
+    }
+    </script>
+    <script>
+
+                function getCookie(name) // 读cookie
+                {
+                    var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+                    if (arr = document.cookie.match(reg))
+                        return unescape(arr[2]);
+                    else
+                        return null;
+                }
+
+                function setCookie(name, value)  // 写cookie
+                {
+                    var Days = 1;
+                    var exp = new Date();
+                    exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
+                    document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString();
+                }
+
+                function getCsrfToken() {
+                    return $("[name='csrfmiddlewaretoken']").val() || getCookie("csrftoken");
+                }
+
+                $('#div_digg .action').click(function () {
+                    var $button = $(this);
+                    var is_up = $button.hasClass("diggit");
+                    var $obj = $button.find(".diggnum");
+                    var is_uped = getCookie("article_{{ article.pk }}");
+                    if (is_uped == 'up') {
+
+                        $('body').append('<div class="toast">您今天已经点过赞了！</div>');
+                        setTimeout(function () {
+                            $('.toast').remove()
+                        }, 1000);
+
+                        return
+                    }
+                    if (is_uped == 'down') {
+                        $('body').append('<div class="toast">您今天已经踩过了！</div>');
+                        setTimeout(function () {
+                            $('.toast').remove()
+                        }, 1000);
+
+
+                        return
+                    }
+                    $button.prop("disabled", true).addClass("is-loading");
+                    $.ajax({
+                        url: "/digg/like",
+                        type: "post",
+                        dataType: "json",
+                        headers: {
+                            "X-CSRFToken": getCsrfToken()
+                        },
+                        data: {
+                            "csrfmiddlewaretoken": getCsrfToken(),
+                            "is_up": is_up,
+                            "article_id": "{{ article.pk }}"
+                        },
+                        success: function (data) {
+                            if (data.state) {
+                                var val = parseInt($obj.text(), 10) || 0;
+                                $obj.text(val + 1);
+                                setCookie("article_{{ article.pk }}", data.info == 'up' ? 'up' : 'down');
+                                $("#digg_tips").html(is_up ? "谢谢点赞" : "已收到反馈");
+                                setTimeout(function () {
+                                    $("#digg_tips").html("")
+                                }, 1200);
+                            } else {
+                                $("#digg_tips").html(data.msg || "操作失败，请稍后重试");
+                                $button.prop("disabled", false);
+                            }
+                        },
+                        error: function () {
+                            $("#digg_tips").html("网络异常，请稍后重试");
+                            $button.prop("disabled", false);
+                        },
+                        complete: function () {
+                            $button.removeClass("is-loading");
+                        }
+                    })
+                });
+
+
+            </script>
+    <script>
+                var gitalk = new Gitalk({
+                    clientID: "{{ gitalk_client_id|escapejs }}",
+                    clientSecret: "{{ gitalk_client_secret|escapejs }}",
+                    repo: 'gittalk',
+                    owner: 'x931890193',
+                    admin: ['x931890193'],
+                    id: location.pathname,      // Ensure uniqueness and length less than 50
+                    distractionFreeMode: false  // Facebook-like distraction free mode
+                });
+                gitalk.render('gitalk-container')
+            </script>
+    <script>
+        (function () {
+            var rewarddiv = $("#reward");
+            var rewardBackdrop = $("#rewardBackdrop");
+            var payToggle = $("#rewardToggle");
+            var payImage = $("#rewardCode");
+            var imgurl = payImage.attr("src");
+            var shareFabToggle = $("#shareFab");
+            var pageShare = $("#pageShare");
+            var pageShareAttr = pageShare.attr("class");
+            var rewardScrollTop = 0;
+            var lastRewardTouch = 0;
+
+            function moveRewardToBody() {
+                if (rewardBackdrop.length && rewardBackdrop.parent()[0] !== document.body) {
+                    rewardBackdrop.appendTo("body");
+                }
+                if (rewarddiv.length && rewarddiv.parent()[0] !== document.body) {
+                    rewarddiv.appendTo("body");
+                }
+            }
+
+            function openRewardModal(event) {
+                if (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                moveRewardToBody();
+                rewardScrollTop = window.pageYOffset || document.documentElement.scrollTop || 0;
+                $("html, body").addClass("reward-modal-open");
+                rewardBackdrop.addClass("in");
+                rewarddiv.addClass("ready in").attr("aria-hidden", "false");
+            }
+
+            function closeRewardModal(event) {
+                if (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                rewarddiv.removeClass("ready in").attr("aria-hidden", "true");
+                rewardBackdrop.removeClass("in");
+                $("html, body").removeClass("reward-modal-open").css("top", "");
+                var currentScrollTop = window.pageYOffset || document.documentElement.scrollTop || 0;
+                if (Math.abs(currentScrollTop - rewardScrollTop) > 8) {
+                    window.scrollTo(0, rewardScrollTop);
+                }
+            }
+
+            $(document).on("touchend", "#rewardBtn", function (event) {
+                lastRewardTouch = Date.now();
+                openRewardModal(event);
+            });
+
+            $(document).on("click", "#rewardBtn", function (event) {
+                if (Date.now() - lastRewardTouch < 450) {
+                    event.preventDefault();
+                    return;
+                }
+                openRewardModal(event);
+            });
+
+            $(document).on("click touchend", "#reward .close, #rewardBackdrop", closeRewardModal);
+
+            payToggle.on("change click", function () {
+                if (payToggle.prop("checked")) {
+                    imgurl = payToggle.data("alipay") || "https://cdn.mongona.com/static/images/alipay.jpg";
+                } else {
+                    imgurl = payToggle.data("wechat") || "https://cdn.mongona.com/static/images/wechat.jpg";
+                }
+                payImage.attr("src", imgurl);
+            });
+
+            shareFabToggle.click(function () {
+                if (pageShareAttr === "page-share") {
+                    pageShare.attr("class", "page-share in");
+                    pageShareAttr = "page-share in";
+                } else {
+                    pageShare.attr("class", "page-share");
+                    pageShareAttr = "page-share";
+                }
+            });
+        }());
+    </script>
+    <script src="{% static 'highlight/highlight.pack.js' %}"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+{% endblock %}

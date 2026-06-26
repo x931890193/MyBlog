@@ -1,0 +1,857 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load mytags %}
+
+{% block site_title %}Gallery | {{ siteinfo.site_name }}{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/chromagallery.min.css' %}">
+    <style>
+        .gallery-lounge {
+            color: #1d1d1f;
+        }
+
+        .gallery-lounge a {
+            color: #0071e3;
+        }
+
+        .gallery-canvas-origin {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            overflow: hidden !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+
+        .gallery-hero {
+            position: relative;
+            margin: 0 0 18px;
+            padding: 34px 30px;
+            overflow: hidden;
+            color: #1d1d1f;
+            background: linear-gradient(135deg, #ffffff 0%, #f5f5f7 46%, #eaf4ff 100%);
+            border: 1px solid rgba(0, 0, 0, .06);
+            border-radius: 8px;
+            box-shadow: 0 18px 46px rgba(0, 0, 0, .08);
+        }
+
+        .gallery-hero:before {
+            content: "";
+            position: absolute;
+            inset: auto 24px 0 auto;
+            width: 46%;
+            height: 4px;
+            background: linear-gradient(90deg, #0071e3, #34c759, #ff375f);
+            border-radius: 999px 999px 0 0;
+        }
+
+        .gallery-kicker,
+        .gallery-track-kicker {
+            color: #6e6e73;
+            font-size: 12px;
+            font-weight: 800;
+            line-height: 1.4;
+            text-transform: uppercase;
+            letter-spacing: 0;
+        }
+
+        .gallery-hero h2 {
+            margin: 10px 0 10px;
+            color: #1d1d1f;
+            font-size: 34px;
+            font-weight: 800;
+            line-height: 1.12;
+            letter-spacing: 0;
+        }
+
+        .gallery-hero p {
+            max-width: 720px;
+            margin: 0;
+            color: #424245;
+            font-size: 15px;
+            line-height: 1.75;
+        }
+
+        .gallery-stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+            margin-top: 22px;
+        }
+
+        .gallery-stats div {
+            min-width: 0;
+            padding: 14px;
+            background: rgba(255, 255, 255, .76);
+            border: 1px solid rgba(0, 0, 0, .06);
+            border-radius: 8px;
+        }
+
+        .gallery-stats strong {
+            display: block;
+            color: #1d1d1f;
+            font-size: 24px;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .gallery-stats span {
+            display: block;
+            margin-top: 7px;
+            color: #6e6e73;
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+        .gallery-music-card,
+        .gallery-about-card,
+        .gallery-wall-card {
+            margin-bottom: 18px;
+            padding: 18px;
+            background: rgba(255, 255, 255, .96);
+            border: 1px solid rgba(0, 0, 0, .07);
+            border-radius: 8px;
+            box-shadow: 0 14px 36px rgba(0, 0, 0, .07);
+        }
+
+        .gallery-about-card {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(220px, 280px);
+            gap: 18px;
+            align-items: stretch;
+        }
+
+        .gallery-about-copy h3 {
+            margin: 8px 0 10px;
+            color: #1d1d1f;
+            font-size: 24px;
+            font-weight: 800;
+            line-height: 1.22;
+            letter-spacing: 0;
+        }
+
+        .gallery-about-copy p {
+            max-width: 720px;
+            margin: 0;
+            color: #424245;
+            font-size: 14px;
+            line-height: 1.76;
+        }
+
+        .gallery-about-points {
+            display: grid;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .gallery-about-points span {
+            display: inline-flex;
+            align-items: center;
+            width: fit-content;
+            min-height: 30px;
+            padding: 0 11px;
+            color: #1d1d1f;
+            background: #f5f5f7;
+            border: 1px solid rgba(0, 0, 0, .06);
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .gallery-about-panel {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 150px;
+            padding: 16px;
+            background: linear-gradient(135deg, #f5f5f7 0%, #ffffff 100%);
+            border: 1px solid rgba(0, 0, 0, .06);
+            border-radius: 8px;
+        }
+
+        .gallery-about-panel strong {
+            display: block;
+            color: #1d1d1f;
+            font-size: 18px;
+            font-weight: 800;
+            line-height: 1.25;
+        }
+
+        .gallery-about-panel a {
+            display: inline-flex;
+            align-items: center;
+            align-self: flex-start;
+            min-height: 34px;
+            padding: 0 13px;
+            color: #fff;
+            background: #0071e3;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 700;
+            line-height: 1;
+            text-decoration: none;
+        }
+
+        .gallery-music-card {
+            display: grid;
+            grid-template-columns: minmax(132px, 180px) minmax(0, 1fr);
+            gap: 18px;
+            align-items: stretch;
+        }
+
+        .gallery-album {
+            position: relative;
+            overflow: hidden;
+            min-height: 180px;
+            background: #f5f5f7;
+            border-radius: 8px;
+        }
+
+        .gallery-album img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            min-height: 180px;
+            object-fit: cover;
+        }
+
+        .gallery-track {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .gallery-track h3 {
+            margin: 8px 0 6px;
+            color: #1d1d1f;
+            font-size: 23px;
+            font-weight: 800;
+            line-height: 1.2;
+            letter-spacing: 0;
+        }
+
+        .gallery-track p {
+            margin: 0 0 12px;
+            color: #6e6e73;
+            font-size: 13px;
+            line-height: 1.65;
+        }
+
+        .gallery-player-wrap {
+            margin-top: auto;
+        }
+
+        .gallery-player-wrap .aplayer {
+            margin: 0;
+            overflow: hidden;
+            background: #fff;
+            border: 1px solid rgba(0, 0, 0, .06);
+            border-radius: 8px;
+            box-shadow: none;
+        }
+
+        .gallery-player-wrap .aplayer .aplayer-pic {
+            position: relative !important;
+        }
+
+        .gallery-player-wrap .aplayer .aplayer-pic .aplayer-button {
+            position: absolute !important;
+            top: 50% !important;
+            right: auto !important;
+            bottom: auto !important;
+            left: 50% !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 46px !important;
+            height: 46px !important;
+            margin: 0 !important;
+            color: #fff !important;
+            background: rgba(0, 0, 0, .34) !important;
+            border: 2px solid rgba(255, 255, 255, .92) !important;
+            border-radius: 50% !important;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, .24) !important;
+            text-shadow: none !important;
+            transform: translate3d(-50%, -50%, 0) !important;
+        }
+
+        .gallery-player-wrap .aplayer .aplayer-pic .aplayer-button.aplayer-hide {
+            display: none !important;
+        }
+
+        .gallery-player-wrap .aplayer .aplayer-pic .aplayer-play .aplayer-icon-play,
+        .gallery-player-wrap .aplayer .aplayer-pic .aplayer-pause .aplayer-icon-pause {
+            position: static !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: auto !important;
+            height: auto !important;
+            margin: 0 !important;
+            font-size: 22px !important;
+            line-height: 1 !important;
+        }
+
+        .gallery-player-wrap .aplayer .aplayer-pic .aplayer-play .aplayer-icon-play {
+            transform: translateX(2px) !important;
+        }
+
+        .gallery-player-wrap .aplayer .aplayer-pic .aplayer-pause .aplayer-icon-pause {
+            font-size: 20px !important;
+        }
+
+        .gallery-music-canvas-frame {
+            position: relative;
+            height: 112px;
+            margin-top: 12px;
+            overflow: hidden;
+            background: #05060a;
+            border-radius: 8px;
+            isolation: isolate;
+        }
+
+        .gallery-music-canvas-frame canvas.canvas_container {
+            position: absolute !important;
+            inset: 0 !important;
+            display: block !important;
+            width: 100% !important;
+            height: 100% !important;
+            max-width: none !important;
+            margin: 0 !important;
+            filter: saturate(1.3) contrast(1.1) !important;
+            mix-blend-mode: screen !important;
+            opacity: .96 !important;
+            pointer-events: none !important;
+        }
+
+        .gallery-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .gallery-actions a,
+        .gallery-actions button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 36px;
+            padding: 0 14px;
+            color: #fff;
+            background: #0071e3;
+            border: 1px solid #0071e3;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 700;
+            line-height: 1;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .gallery-actions button:disabled {
+            cursor: wait;
+            opacity: .62;
+        }
+
+        .gallery-actions .gallery-secondary-action {
+            color: #0071e3;
+            background: #fff;
+            border-color: rgba(0, 113, 227, .35);
+        }
+
+        .gallery-wall-head {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+
+        .gallery-wall-head h3 {
+            margin: 0;
+            color: #1d1d1f;
+            font-size: 22px;
+            font-weight: 800;
+            line-height: 1.25;
+            letter-spacing: 0;
+        }
+
+        .gallery-wall-head span {
+            color: #86868b;
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+        .gallery-lounge .content {
+            width: 100%;
+            height: auto;
+            margin: 0;
+        }
+
+        .gallery-lounge .mygallery {
+            margin: 0;
+        }
+
+        .gallery-lounge .chroma-gallery img {
+            border-radius: 8px;
+        }
+
+        @media only screen and (max-width: 760px) {
+            .gallery-hero {
+                padding: 26px 18px;
+            }
+
+            .gallery-hero h2 {
+                font-size: 28px;
+            }
+
+            .gallery-stats,
+            .gallery-about-card,
+            .gallery-music-card {
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+            .gallery-album,
+            .gallery-album img {
+                min-height: 220px;
+            }
+
+            .gallery-wall-head {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .gallery-actions a,
+        .gallery-actions button {
+                width: 100%;
+            }
+        }
+    </style>
+{% endblock css %}
+
+{% block article %}
+    <article class="gallery-lounge">
+        <section class="gallery-hero">
+            <div class="gallery-kicker">Gallery Lounge</div>
+            <h2>影像和声音一起看</h2>
+            <p>照片、旋律与动态光影在同一屏幕中展开，让每一次浏览都像一段可播放的记忆。</p>
+            <div class="gallery-stats">
+                <div><strong>{{ images|length }}</strong><span>照片片段</span></div>
+                <div><strong>1</strong><span>随机音乐</span></div>
+                <div><strong>Live</strong><span>音乐光效</span></div>
+            </div>
+        </section>
+
+        <section class="gallery-about-card" id="gallery-about">
+            <div class="gallery-about-copy">
+                <div class="gallery-kicker">About</div>
+                <h3>把影像、音乐和交互放在同一个浏览节奏里</h3>
+                <p>这个页面用于沉淀站点里的照片、随机音乐和动态光效。它不是普通相册列表，而是一个可以停留、播放、切换和继续探索的个人内容空间。</p>
+                <div class="gallery-about-points">
+                    <span>图片墙 · 大图浏览</span>
+                    <span>随机音乐 · 无刷新切换</span>
+                    <span>光效舞台 · 跟随播放状态启动</span>
+                </div>
+            </div>
+            <aside class="gallery-about-panel">
+                <div>
+                    <div class="gallery-kicker">Mongona</div>
+                    <strong>一个长期维护的个人技术与生活站点</strong>
+                </div>
+                <a href="/?c=6">了解作者</a>
+            </aside>
+        </section>
+
+        {% if music_data %}
+            <section class="gallery-music-card">
+                <div class="gallery-album">
+                    <img id="galleryAlbum" src="{{ music_data.images }}?param=420y420" alt="{{ music_data.title }}封面图">
+                </div>
+                <div class="gallery-track">
+                    <div class="gallery-track-kicker">Now Playing</div>
+                    <h3 id="galleryTrackTitle">{{ music_data.title|default:"Random Music" }}</h3>
+                    <p id="galleryTrackMeta">{{ music_data.author|default:"Mongona Radio" }}{% if music_data.comment_nickname %} · 来自 @{{ music_data.comment_nickname }} 的评论{% endif %}</p>
+                    <p id="galleryTrackComment">{{ music_data.comment_content|default:"这首歌暂时没有精选评论。" }}</p>
+                    <div class="gallery-player-wrap">
+                        <div id="galleryPlayer" class="aplayer">
+                            <pre class="aplayer-lrc-content">{% for lrc in music_data.format_lrc %}
+{{ lrc }}
+{% endfor %}</pre>
+                        </div>
+                        <div id="galleryMusicCanvasFrame" class="gallery-music-canvas-frame" aria-hidden="true"></div>
+                    </div>
+                    <div class="gallery-actions">
+                        <a href="/?c=5">打开独立音乐页</a>
+                        <button type="button" id="galleryNextMusic" class="gallery-secondary-action">换一首随机音乐</button>
+                    </div>
+                </div>
+            </section>
+        {% endif %}
+
+        <section class="gallery-wall-card">
+            <div class="gallery-wall-head">
+                <div>
+                    <div class="gallery-kicker">Photo Wall</div>
+                    <h3>相册墙</h3>
+                </div>
+                <span>点击图片进入大图浏览</span>
+            </div>
+            <div class="content">
+                <div class="chroma-gallery mygallery">
+                    {% for foo in images %}
+                        <img src="{{ MEDIA_URL }}{{ foo.image_path }}"
+                             alt="{{ foo.image_detail|default:foo.image_title }}"
+                             data-largesrc="{{ MEDIA_URL }}{{ foo.image_path }}">
+                    {% empty %}
+                        <div class="empty-state">暂时没有图片。</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+    </article>
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+    <script src="{% static 'js/chromagallery.pkgd.min.js' %}"></script>
+    {% if music_data %}
+        <script src="https://cdn.mongona.com/static/js/canvas.js?v=20260624canvasstop1"></script>
+        <script src="https://cdn.mongona.com/static/APlayer.min.js?v=20260623aplayer1"></script>
+    {% endif %}
+    <script>
+        $(function () {
+            if ($.fn.chromaGallery) {
+                $(".mygallery").chromaGallery({
+                    color: '#111827',
+                    gridMargin: 12,
+                    maxColumns: 5,
+                    dof: true,
+                    screenOpacity: 0.86
+                });
+            }
+
+            {% if music_data %}
+            var galleryPlayer = null;
+            var $album = $('#galleryAlbum');
+            var $title = $('#galleryTrackTitle');
+            var $meta = $('#galleryTrackMeta');
+            var $comment = $('#galleryTrackComment');
+            var $next = $('#galleryNextMusic');
+            var watchCanvas = function () {};
+            var pageMusicSyncId = 'gallery-' + Date.now() + '-' + Math.random().toString(36).slice(2);
+
+            function normalizePageMusic(data) {
+                data = data || {};
+                return {
+                    title: data.title || 'Random Music',
+                    author: data.author || 'Mongona Radio',
+                    images: data.images || data.pic || '',
+                    pic: data.images || data.pic || '',
+                    mp3_url: data.mp3_url || data.url || '',
+                    url: data.mp3_url || data.url || '',
+                    comment_nickname: data.comment_nickname || data.nickname || '',
+                    comment_content: data.comment_content || '',
+                    comment_pub_date: data.comment_pub_date || '',
+                    format_lrc: data.format_lrc || []
+                };
+            }
+
+            function startGalleryCanvas() {
+                if (!document.querySelector("canvas.canvas_container") && window.$$$ && typeof window.$$$.init === "function") {
+                    try {
+                        window.$$$.init();
+                    } catch (err) {
+                        if (window.console) {
+                            console.warn(err);
+                        }
+                    }
+                }
+                watchCanvas();
+            }
+
+            var currentMusic = {
+                title: "{{ music_data.title|escapejs }}",
+                author: "{{ music_data.author|escapejs }}",
+                images: "{{ music_data.images|escapejs }}",
+                mp3_url: "{{ music_data.mp3_url|escapejs }}",
+                comment_nickname: "{{ music_data.comment_nickname|escapejs }}",
+                comment_content: "{{ music_data.comment_content|escapejs }}",
+                format_lrc: [{% for lrc in music_data.format_lrc %}"{{ lrc|escapejs }}"{% if not forloop.last %}, {% endif %}{% endfor %}]
+            };
+            if (window.MongonaMusic && window.MongonaMusic.state && window.MongonaMusic.state().track && window.MongonaMusic.state().track.url) {
+                currentMusic = normalizePageMusic(window.MongonaMusic.state().track);
+            }
+
+            function musicMeta(data) {
+                var meta = data.author || 'Mongona Radio';
+                if (data.comment_nickname) {
+                    meta += ' · 来自 @' + data.comment_nickname + ' 的评论';
+                }
+                return meta;
+            }
+
+            function bindPlayerState(player) {
+                if (!player || !player.audio) {
+                    return;
+                }
+                player.audio.setAttribute('preload', 'metadata');
+                player.audio.addEventListener('play', function () {
+                    if (window.MongonaMusic && typeof window.MongonaMusic.adopt === 'function') {
+                        window.MongonaMusic.adopt(player.audio, currentMusic, {
+                            player: player,
+                            sourceId: pageMusicSyncId
+                        });
+                    }
+                    startGalleryCanvas();
+                });
+                player.audio.addEventListener('error', function () {
+                    $comment.text('当前音频暂时无法播放，请再换一首试试。');
+                });
+            }
+
+            function stopGalleryPlayer() {
+                if (!galleryPlayer) {
+                    return;
+                }
+                try {
+                    if (galleryPlayer.audio) {
+                        galleryPlayer.audio.pause();
+                        galleryPlayer.audio.removeAttribute('src');
+                        galleryPlayer.audio.load();
+                    }
+                } catch (err) {
+                    if (window.console) {
+                        console.warn(err);
+                    }
+                }
+                try {
+                    if (typeof galleryPlayer.destroy === 'function') {
+                        galleryPlayer.destroy();
+                    }
+                } catch (err) {
+                    if (window.console) {
+                        console.warn(err);
+                    }
+                }
+                galleryPlayer = null;
+            }
+
+            function ensureGalleryPlayerElement() {
+                var playerElement = document.getElementById('galleryPlayer');
+                if (!playerElement) {
+                    $('.gallery-player-wrap').prepend('<div id="galleryPlayer" class="aplayer"></div>');
+                    playerElement = document.getElementById('galleryPlayer');
+                }
+                return playerElement;
+            }
+
+            function renderMusic(data, options) {
+                options = options || {};
+                var shouldResume = options.autoplay === true ||
+                    (galleryPlayer && galleryPlayer.audio && !galleryPlayer.audio.paused) ||
+                    (window.MongonaMusic && typeof window.MongonaMusic.isPlaying === 'function' && window.MongonaMusic.isPlaying());
+                stopGalleryPlayer();
+                currentMusic = normalizePageMusic(data || currentMusic);
+                $album.attr('src', (currentMusic.images || '') + '?param=420y420');
+                $album.attr('alt', (currentMusic.title || 'Random Music') + '封面图');
+                $title.text(currentMusic.title || 'Random Music');
+                $meta.text(musicMeta(currentMusic));
+                $comment.text(currentMusic.comment_content || '这首歌暂时没有精选评论。');
+
+                var playerElement = ensureGalleryPlayerElement();
+                $('#galleryPlayer').html('<pre class="aplayer-lrc-content"></pre>');
+                $('#galleryPlayer .aplayer-lrc-content').text((currentMusic.format_lrc || []).join('\n'));
+
+                try {
+                    galleryPlayer = new APlayer({
+                        element: playerElement,
+                        narrow: false,
+                        autoplay: false,
+                        showlrc: true,
+                        music: {
+                            title: currentMusic.title || 'Random Music',
+                            author: currentMusic.author || 'Mongona Radio',
+                            url: currentMusic.mp3_url || '',
+                            pic: currentMusic.images || ''
+                        }
+                    });
+                    galleryPlayer.init();
+                    bindPlayerState(galleryPlayer);
+                    if (window.MongonaMusic && typeof window.MongonaMusic.attachPlayer === 'function') {
+                        window.MongonaMusic.attachPlayer(galleryPlayer, currentMusic, {
+                            autoplay: shouldResume,
+                            sourceId: pageMusicSyncId
+                        }).catch(function () {});
+                    } else if (shouldResume && galleryPlayer.audio && galleryPlayer.audio.paused) {
+                        galleryPlayer.audio.play().catch(function () {});
+                    }
+                } catch (err) {
+                    $comment.text('播放器初始化失败，请稍后再试。');
+                    if (window.console) {
+                        console.error(err);
+                    }
+                }
+            }
+
+            $next.on('click', function () {
+                var originalText = $next.text();
+                $next.prop('disabled', true).text('切换中...');
+                if (window.MongonaMusic && typeof window.MongonaMusic.nextRandom === 'function') {
+                    Promise.resolve(window.MongonaMusic.nextRandom()).catch(function () {
+                        $comment.text('随机音乐接口暂时不可用。');
+                    }).then(function () {
+                        $next.prop('disabled', false).text(originalText);
+                    });
+                    return;
+                }
+                $.getJSON('/api/random-music/')
+                    .done(function (res) {
+                        if (res && res.code === 0 && res.data) {
+                            renderMusic(res.data, {autoplay: true});
+                        } else {
+                            $comment.text('暂时没有拿到新的音乐。');
+                        }
+                    })
+                    .fail(function () {
+                        $comment.text('随机音乐接口暂时不可用。');
+                    })
+                    .always(function () {
+                        $next.prop('disabled', false).text(originalText);
+                    });
+            });
+
+            (function () {
+                var frame = document.getElementById("galleryMusicCanvasFrame");
+                var timer = null;
+                var observer = null;
+
+                function canvasList() {
+                    return Array.prototype.slice.call(document.querySelectorAll("canvas.canvas_container"));
+                }
+
+                function fitCanvas(canvas) {
+                    if (!frame || !canvas) {
+                        return;
+                    }
+                    canvas.style.position = "absolute";
+                    canvas.style.inset = "0";
+                    canvas.style.width = "100%";
+                    canvas.style.height = "100%";
+                    canvas.style.maxWidth = "none";
+                    canvas.style.margin = "0";
+                    canvas.style.display = "block";
+                    canvas.style.pointerEvents = "none";
+                }
+
+                function normalizeCanvas() {
+                    if (!frame) {
+                        return false;
+                    }
+                    var canvases = canvasList();
+                    if (!canvases.length) {
+                        return false;
+                    }
+                    var keeper = canvases[canvases.length - 1];
+                    for (var i = 0; i < canvases.length; i += 1) {
+                        if (canvases[i] !== keeper && canvases[i].parentNode) {
+                            canvases[i].parentNode.removeChild(canvases[i]);
+                        }
+                    }
+                    if (keeper.parentNode !== frame) {
+                        frame.appendChild(keeper);
+                    }
+                    keeper.className = "canvas_container";
+                    fitCanvas(keeper);
+                    return true;
+                }
+
+                function syncGalleryMusic(event) {
+                    var detail = event.detail || {};
+                    var track = normalizePageMusic(detail.track);
+                    var sameTrack = track.mp3_url && track.mp3_url === currentMusic.mp3_url;
+                    if (!track.mp3_url) {
+                        return;
+                    }
+                    if (sameTrack) {
+                        if (!galleryPlayer || !galleryPlayer.audio || detail.sourceId === pageMusicSyncId) {
+                            return;
+                        }
+                        if (typeof detail.currentTime === "number" && Math.abs((galleryPlayer.audio.currentTime || 0) - detail.currentTime) > 1.2) {
+                            try {
+                                galleryPlayer.audio.currentTime = detail.currentTime;
+                            } catch (err) {}
+                        }
+                        if (detail.paused) {
+                            if (!galleryPlayer.audio.paused) {
+                                if (typeof galleryPlayer.pause === "function") {
+                                    galleryPlayer.pause();
+                                } else {
+                                    galleryPlayer.audio.pause();
+                                }
+                            }
+                            return;
+                        }
+                        if (window.MongonaMusic && typeof window.MongonaMusic.attachPlayer === "function") {
+                            window.MongonaMusic.attachPlayer(galleryPlayer, currentMusic, {
+                                autoplay: true,
+                                currentTime: detail.currentTime || 0,
+                                sourceId: pageMusicSyncId
+                            }).catch(function () {});
+                        } else {
+                            galleryPlayer.audio.play().catch(function () {});
+                        }
+                        return;
+                    }
+                    renderMusic(track, {autoplay: !detail.paused});
+                }
+
+                watchCanvas = function () {
+                    var attempts = 0;
+                    clearInterval(timer);
+                    timer = setInterval(function () {
+                        attempts += 1;
+                        if (normalizeCanvas() && attempts > 8) {
+                            clearInterval(timer);
+                        }
+                        if (attempts > 40) {
+                            clearInterval(timer);
+                        }
+                    }, 120);
+                };
+
+                if (window.MutationObserver && frame) {
+                    observer = new MutationObserver(normalizeCanvas);
+                    observer.observe(document.body, {childList: true, subtree: true});
+                }
+                $(window).on("resize.galleryMusic orientationchange.galleryMusic", function () {
+                    fitCanvas(frame ? frame.querySelector("canvas.canvas_container") : null);
+                });
+                document.addEventListener("mongona:music-sync", syncGalleryMusic);
+                window.MongonaPagePlayTrack = function (track, options) {
+                    renderMusic(track, {autoplay: !options || options.autoplay !== false});
+                    return true;
+                };
+                window.MongonaPageCleanup = function () {
+                    clearInterval(timer);
+                    $(window).off(".galleryMusic");
+                    if (observer) {
+                        observer.disconnect();
+                    }
+                    if (window.$$$ && typeof window.$$$.__del === "function") {
+                        window.$$$.__del();
+                    }
+                    document.removeEventListener("mongona:music-sync", syncGalleryMusic);
+                    window.MongonaPagePlayTrack = null;
+                    stopGalleryPlayer();
+                };
+                watchCanvas();
+            }());
+
+            renderMusic(currentMusic);
+            {% endif %}
+        });
+    </script>
+{% endblock %}

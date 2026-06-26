@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title> bug🆖～～ &nbsp;| </title>
+    <link rel="shortcut icon" href="">
+    <meta name="keywords" content="Python,Django,go,Java,sql,linux,javascript,jquery,git,教程,软件,编程,开发,运维,云计算,网络,互联网">
+    <meta name="description" content="www.mongona.com ,为 IT 开发者提供了一个发现、使用、并交流开源技术的平台。">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!-- amazeui -->
+    <link href="https://cdn.mongona.com/static/amazeui/assets/css/amazeui.min.css" rel="stylesheet">
+    <!-- 当前站点CSS样式文件 -->
+    <link href="https://cdn.mongona.com/static/main.css" rel="stylesheet">
+    <!--music-->
+    <link rel="stylesheet" href="https://cdn.mongona.com/static/APlayer.min.css">
+
+    <!-- jQuery -->
+    <script src="https://cdn.mongona.com/static/amazeui/assets/js/jquery.min.js" type="text/javascript"></script>
+    <!-- amazeui.js app.js -->
+    <script src="https://cdn.mongona.com/static/amazeui/assets/js/amazeui.min.js" type="text/javascript"></script>
+    <!--每日一诗-->
+    <script src="https://sdk.jinrishici.com/v2/browser/jinrishici.js" charset="utf-8"></script>
+<style>
+        body {
+            font-family: "SF Pro SC", "SF Pro Text", "SF Pro Icons", "PingFang SC", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+
+        }
+
+        .header-weather {
+            color: #fff;
+            position: fixed;
+            z-index: 999;
+            top: 53px;
+            right: 10px;
+            text-align: center;
+            background-color: gray;
+            border-radius: 6px;
+        }
+
+        .weather-t1:after {
+            position: absolute;
+            content: "°";
+        }
+
+        .weather-t2:after {
+            position: absolute;
+        }
+
+        .weather-t1 {
+            font-size: 16px;
+        }
+
+        .weather-t2 {
+            margin-left: 2px;
+            font-size: 10px;
+        }
+
+        .weather-t2:after {
+            top: 8px;
+        }
+
+        .weather-city {
+            font-size: 12px;
+        }
+
+        /**/
+:root {
+  --main-color: #eaeaea;
+  --stroke-color: black;
+
+}
+h1 {
+  margin: 100px auto 0 auto;
+  color: var(--stroke-color);
+  font-family: 'Encode Sans Semi Condensed', Verdana, sans-serif;
+  font-size: 10rem; line-height: 10rem;
+  font-weight: 200;
+  text-align: center;
+}
+h2 {
+  margin: 20px auto 30px auto;
+  font-family: 'Encode Sans Semi Condensed', Verdana, sans-serif;
+  font-size: 1.5rem;
+  font-weight: 200;
+  text-align: center;
+}
+h1, h2 {
+  -webkit-transition: opacity 0.5s linear, margin-top 0.5s linear; /* Safari */
+  transition: opacity 0.5s linear, margin-top 0.5s linear;
+}
+.gears {
+  position: relative;
+  margin: 0 auto;
+  width: auto; height: 0;
+}
+.gear {
+  position: relative;
+  z-index: 0;
+  width: 120px; height: 120px;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: var(--stroke-color);
+}
+.gear:before{
+  position: absolute; left: 5px; top: 5px; right: 5px; bottom: 5px;
+  z-index: 2;
+  content: "";
+  border-radius: 50%;
+  background: var(--main-color);
+}
+.gear:after {
+  position: absolute; left: 25px; top: 25px;
+  z-index: 3;
+  content: "";
+  width: 70px; height: 70px;
+  border-radius: 50%;
+  border: 5px solid var(--stroke-color);
+  box-sizing: border-box;
+  background: var(--main-color);
+}
+.gear.one {
+  left: -130px;
+}
+.gear.two {
+  top: -75px;
+}
+.gear.three {
+  top: -235px;
+  left: 130px;
+}
+.gear .bar {
+  position: absolute; left: -15px; top: 50%;
+  z-index: 0;
+  width: 150px; height: 30px;
+  margin-top: -15px;
+  border-radius: 5px;
+  background: var(--stroke-color);
+}
+.gear .bar:before {
+  position: absolute; left: 5px; top: 5px; right: 5px; bottom: 5px;
+  z-index: 1;
+  content: "";
+  border-radius: 2px;
+  background: var(--main-color);
+}
+.gear .bar:nth-child(2) {
+  transform: rotate(60deg);
+  -webkit-transform: rotate(60deg);
+}
+.gear .bar:nth-child(3) {
+  transform: rotate(120deg);
+  -webkit-transform: rotate(120deg);
+}
+@-webkit-keyframes clockwise {
+  0% { -webkit-transform: rotate(0deg);}
+  100% { -webkit-transform: rotate(360deg);}
+}
+@-webkit-keyframes anticlockwise {
+  0% { -webkit-transform: rotate(360deg);}
+  100% { -webkit-transform: rotate(0deg);}
+}
+@-webkit-keyframes clockwiseError {
+  0% { -webkit-transform: rotate(0deg);}
+  20% { -webkit-transform: rotate(30deg);}
+  40% { -webkit-transform: rotate(25deg);}
+  60% { -webkit-transform: rotate(30deg);}
+  100% { -webkit-transform: rotate(0deg);}
+}
+@-webkit-keyframes anticlockwiseErrorStop {
+  0% { -webkit-transform: rotate(0deg);}
+  20% { -webkit-transform: rotate(-30deg);}
+  60% { -webkit-transform: rotate(-30deg);}
+  100% { -webkit-transform: rotate(0deg);}
+}
+@-webkit-keyframes anticlockwiseError {
+  0% { -webkit-transform: rotate(0deg);}
+  20% { -webkit-transform: rotate(-30deg);}
+  40% { -webkit-transform: rotate(-25deg);}
+  60% { -webkit-transform: rotate(-30deg);}
+  100% { -webkit-transform: rotate(0deg);}
+}
+.gear.one {
+  -webkit-animation: anticlockwiseErrorStop 2s linear infinite;
+}
+.gear.two {
+  -webkit-animation: anticlockwiseError 2s linear infinite;
+}
+.gear.three {
+  -webkit-animation: clockwiseError 2s linear infinite;
+}
+.loading .gear.one, .loading .gear.three {
+  -webkit-animation: clockwise 3s linear infinite;
+}
+.loading .gear.two {
+  -webkit-animation: anticlockwise 3s linear infinite;
+}
+    </style>
+
+</head>
+<body>
+<header class="am-topbar am-topbar-fixed-top">
+    <div class="am-g am-g-fixed blog-g-fixed">
+        <h1 class="am-topbar-brand am-center">
+            <a href="/" style="font-size:2.8rem">mongona</a>
+        </h1>
+        <button class="am-topbar-btn am-topbar-toggle am-btn am-btn-sm am-btn-primary am-show-sm-only"
+                data-am-collapse="{target: '#doc-topbar-collapse'}">
+            <span class="am-icon-bars"></span></button>
+
+        <div class="am-collapse am-topbar-collapse" id="doc-topbar-collapse">
+            <ul class="am-nav am-nav-pills am-topbar-nav">
+                <li class=""><a href="/">Home</a></li>
+                <li class=""><a href="/?g=tech">Tech</a></li>
+                <li class=""><a href="/radar/">Radar</a></li>
+                <li class=""><a href="/tools/">Tools</a></li>
+                <li class=""><a href="/sponsor/">Sponsor</a></li>
+                <li class=""><a href="/?c=4">Gallery</a></li>
+                <li class=""><a href="/?c=6">About</a>
+                </li>
+
+            </ul>
+            <form class="am-topbar-form am-topbar-left am-form-inline am-topbar-right" action="/">
+
+                <div class="am-form-group">
+                    <input type="text" class="am-form-field am-input-sm bosiinput" placeholder="Search You  🤓️" name="s">
+                </div>
+                <button type="submit" class="am-btn am-btn-primary am-btn-sm">
+                    <i class="am-icon-search"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</header>
+
+<a href="https://www.tianqiapi.com"  target="_blank">
+    <div class="header-weather">
+        <span class="weather-t1">--</span>
+        <span class="weather-t2">--</span>
+        <div class="weather-city">正在获取天气</div>
+    </div>
+</a>
+
+<div class="am-g am-g-fixed blog-g-fixed">
+<div class="article-main">
+<div class="loading">
+  <h1>500</h1>
+  <h2>Unexpected Error <b>:(</b></h2>
+  <h2>I don't know what happened </h2>
+  <div class="gears">
+    <div class="gear one">
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
+    </div>
+    <div class="gear two">
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
+    </div>
+    <div class="gear three">
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
+    </div>
+  </div>
+    </div>
+</div>
+</div>
+<script>
+    $(function() {
+  setTimeout(function(){
+    $('body').removeClass('loading');
+  }, 1000);
+});
+    $.get("https://www.tianqiapi.com/api/?version=v6&appid=16914744&appsecret=BqXIPng1", null, function (t) {
+        if (t) {
+            console.log(t);
+            "" === t ? $(".weather-city").text("暂无数据") : ($(".weather-t1").text(t.tem), $(".weather-t2").text(t.humidity), $(".weather-city").text(t.city + "/" + t.wea + "/" + t.win));
+        } else {
+            (".weather-city").text("暂无数据");
+        }
+    }, "JSON");
+</script>
+</body>
+</html>
