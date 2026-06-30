@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load mytags %}
+{% block site_title %} sato&nbsp;| {{ siteinfo.site_name }} {% endblock %}
+{% block css %}
+    <script src="{% static 'valine.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/normalize.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/ckin.css' %}">
+    <link rel="stylesheet" href="{% static 'css/demo.css' %}">
+{% endblock css %}
+{% block article %}
+    <article class="article-main">
+
+        <div class="blog-content">
+            <div class="am-text-lg nick-name">简单背景</div>
+            <ul>
+                <li>94 年诞生</li>
+                <li>重庆巴南, 目前北漂</li>
+                <li>本科<a href="https://www.ysu.edu.cn/" target="_blank">燕山大学</a></li>
+                <li>后端开发工程师</li>
+                <li>技术宅一枚，喜欢折腾各种电子产品、钻研各种技术。也喜欢骑行、健身等运动。</li>
+                <li>本人精通各种语言的hello word</li>
+                <li>我的理想：<strong style="color: red;">世界和平！</strong><img src="https://cdn.mongona.com/static/images/22309f6212cfce7d52d61c8b67126964c2a5f1b2.gif"></li>
+                <li>我的简历：<a href="http://resume.mongona.com/" target="_blank">http://resume.mongona.com/</a></li>
+                <li>Email: ysudqfs#163.com</li>
+            </ul>
+{% if video %}
+                <div class="htmleaf-container">
+                <header class="htmleaf-header">
+                </header>
+                <section class="demo-section demo-section--light" id="skins">
+                    <div class="container">
+                        <h2 class="title heading">{{ video.title }}</h2>
+                        <div class="demo-list">
+                            <video poster="https://cdn.mongona.com/static/images/ckin.jpg"
+                                   src="{{ video.src }}"
+                                   data-title="{{ video.describe }}" data-ckin="compact" data-overlay="2"></video>
+                        </div>
+                    </div>
+                </section>
+            </div>
+{% endif %}
+        </div>
+    </article>
+
+    <div class="am-text-lg nick-name">给我留言</div>
+    <ul>
+        <li>互联网的广大朋友们，欢迎光临我的小博客！在这里可以留下你的足迹。欢迎在下方留言，欢迎交换友链，一起交流学习！
+        </li>
+    </ul>
+
+    <div id="vcomments"></div>
+    <script>
+        $(function () {
+            new Valine({
+                el: '#vcomments',
+                appId: 'GtHxzyYlzh36CYOe5vRDYbFS-gzGzoHsz',
+                appKey: 'cojAfpXmxWcrBsaT9PtloXpO',
+                notify: true, // 邮件提醒!!!
+                verify: false,
+                path: window.location.href,
+                pageSize: 4,
+                avatar: "monsterid",
+                placeholder: "安得广厦千万间，大庇天下寒士俱欢颜！风雨不动安如山。呜呼！何时眼前突兀见此屋，吾庐独破受冻死亦足！"
+
+            })
+        });
+    </script>
+{% endblock %}
+
+{% block js %}
+    <script src="{% static 'js/ckin.js' %}"></script>
+    <script src="{% static 'amazeui/assets/js/jquery.min.js' %}" type="text/javascript"></script>
+
+{% endblock %}
+
+

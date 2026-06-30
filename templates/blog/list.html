@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load mytags %}
+{% block site_title %}
+    {% if seo_title %}{{ seo_title }}{% elif category_name %}{{ category_name }} &nbsp;| {{ siteinfo.site_name }}{% else %}{{ siteinfo.site_name }}{% endif %}
+{% endblock %}
+{% block meta_keywords %}{{ seo_keywords|default:"Mongona,技术博客,AI工具,Django,Python,Go,Linux,前端开发,开发者工具,自动化,SEO" }}{% endblock %}
+{% block meta_description %}{{ seo_description|default:"Mongona 技术博客，记录 Python、Django、Go、Linux、AI、运维和开发工具实践。" }}{% endblock %}
+{% block article %}
+    {% if not contacts %}
+        <div class="empty-state">There is nothing!</div>
+    {% endif %}
+    {% for article in contacts %}
+        <article class="blog-main post-card">
+            <div class="post-kicker">
+                <span>Signal</span>
+                {% if article.article_category %}
+                    <span>{{ article.article_category.category_name }}</span>
+                {% else %}
+                    <span>Dispatch</span>
+                {% endif %}
+            </div>
+            <h3 class="am-article-title blog-title">
+                {% if article.article_original == '1' %}
+                    <button type="button" class="am-btn am-btn-success am-round am-btn-xs post-badge"
+                            title="本文为{{ article.article_user.user_nick_name }}原创博文">Origin
+                    </button>
+                {% endif %}
+                {% if article.article_original == '0' %}
+                    <button type="button" class="am-btn am-btn-secondary am-round am-btn-xs post-badge" title="本文为转载文章">via</button>
+                {% endif %}
+                <a href="/blog/{{ article.id }}">{{ article.article_title }}</a>
+            </h3>
+
+            <div class="am-article-meta blog-meta">
+                <a href="/?c=6" class="am-link-muted">{{ article.article_user.user_nick_name }}</a>
+                <span class="am-link-muted">{{ article.article_create_time }}</span>
+                <span class="post-hot">Hot: {{ article.article_click }} ℃</span>
+            </div>
+
+            <div class="blog-content post-excerpt">
+                <a href="/blog/{{ article.id }}">
+                    {% if article.article_image %}
+                        <p class="post-cover"><img alt="{{ article.article_title }}" src="{{ MEDIA_URL }}{{ article.article_image }}?imageMogr2/auto-orient/thumbnail/!50p/blur/1x0/quality/100|watermark/2/text/bW9uZ29uYS5jb20=/font/5b6u6L2v6ZuF6buR/fontsize/240/fill/I0M4MTNFQg==/dissolve/100/gravity/SouthEast/dx/10/dy/10|imageslim"></p>
+                    {% endif %}
+
+                    {% autoescape off %}
+                        Abstract:&nbsp;&nbsp;{{ article.article_synopsis }}
+                    {% endautoescape %}
+                </a>
+            </div>
+
+            <div class="post-actions">
+                {% if article.article_tag %}
+                    <span class="post-tagline">{{ article.article_tag }}</span>
+                {% else %}
+                    <span class="post-tagline">Long-form note</span>
+                {% endif %}
+                <a href="/blog/{{ article.id }}" class="post-more" aria-label="Read {{ article.article_title }}">阅读全文</a>
+            </div>
+        </article>
+        <hr class="am-article-divider blog-hr">
+    {% endfor %}
+    <!-- 翻页  -->
+    <ul class="am-pagination am-pagination-centered blog-pagination">
+        {% if contacts.has_previous %}
+            <li class=""><a
+                    href="?{% if t != '' %}t={{ t }}&{% endif %}{% if d != '' %}d={{ d }}&{% endif %}{% if c != '' %}c={{ c }}&{% endif %}{% if g %}g={{ g }}&{% endif %}{% if s != '' %}s={{ s }}&{% endif %}p={{ contacts.previous_page_number }}">&laquo;
+                Pre page</a></li>
+        {% endif %}
+        {% if pages > 1 %}
+            {% for p in pages %}
+
+                <li class="{% if p == page_number %}am-active{% endif %}"><a
+                        href="?{% if t != '' %}t={{ t }}&{% endif %}{% if d != '' %}d={{ d }}&{% endif %}{% if c != '' %}c={{ c }}&{% endif %}{% if g %}g={{ g }}&{% endif %}{% if s != '' %}s={{ s }}&{% endif %}p={{ p }}">{{ p }}</a>
+                </li>
+            {% endfor %}
+        {% else %}
+        {% endif %}
+        {% if contacts.has_next %}
+            <li class=""><a
+                    href="?{% if t != '' %}t={{ t }}&{% endif %}{% if d != '' %}d={{ d }}&{% endif %}{% if c != '' %}c={{ c }}&{% endif %}{% if g %}g={{ g }}&{% endif %}{% if s != '' %}s={{ s }}&{% endif %}p={{ contacts.next_page_number }}">Next
+                page
+                &raquo;</a></li>
+        {% endif %}
+    </ul>
+{% endblock %}
+
+

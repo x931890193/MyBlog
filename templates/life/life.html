@@ -1,0 +1,453 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load mytags %}
+{% block site_title %}{{ data.category_name }}&nbsp;| {{ siteinfo.site_name }} {% endblock %}
+{% block css %}
+    <style id="codex-music-canvas-inline-fix" data-codex-player-center-override="1">
+        .music-page .music-canvas-frame,
+        .music-page .music-canvas-frame.is-active {
+            background: transparent !important;
+            border: 0 !important;
+            box-shadow: none !important;
+            isolation: isolate !important;
+        }
+
+        .music-page .music-canvas-frame canvas.canvas_container {
+            position: absolute !important;
+            inset: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            max-width: none !important;
+            margin: 0 !important;
+            display: block !important;
+            filter: saturate(1.28) contrast(1.12) !important;
+            mix-blend-mode: screen !important;
+            opacity: .98 !important;
+            pointer-events: none !important;
+        }
+
+        .music-page .music .aplayer .aplayer-pic {
+            position: relative !important;
+        }
+
+        .music-page .music .aplayer .aplayer-pic .aplayer-button {
+            position: absolute !important;
+            top: 50% !important;
+            right: auto !important;
+            bottom: auto !important;
+            left: 50% !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 46px !important;
+            height: 46px !important;
+            margin: 0 !important;
+            color: #fff !important;
+            background: rgba(0, 0, 0, .34) !important;
+            border: 2px solid rgba(255, 255, 255, .92) !important;
+            border-radius: 50% !important;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, .24) !important;
+            text-shadow: none !important;
+            transform: translate3d(-50%, -50%, 0) !important;
+        }
+
+        .music-page .music .aplayer .aplayer-pic .aplayer-button.aplayer-hide {
+            display: none !important;
+        }
+
+        .music-page .music .aplayer .aplayer-pic .aplayer-play .aplayer-icon-play,
+        .music-page .music .aplayer .aplayer-pic .aplayer-pause .aplayer-icon-pause {
+            position: static !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: auto !important;
+            height: auto !important;
+            margin: 0 !important;
+            font-size: 22px !important;
+            line-height: 1 !important;
+        }
+
+        .music-page .music .aplayer .aplayer-pic .aplayer-play .aplayer-icon-play {
+            transform: translateX(2px) !important;
+        }
+
+        .music-page .music .aplayer .aplayer-pic .aplayer-pause .aplayer-icon-pause {
+            font-size: 20px !important;
+        }
+
+    </style>
+{% endblock css %}
+
+{% block article %}
+    <article class="article-main">
+        <div class="blog-content music-page">
+            <section class="music-hero-card mask">
+                <div class="music-cover-panel">
+                    <div class="album-container">
+                        <img class="album-img" id="album-img" src="{{ data.images }}?param=320y320"
+                             alt="{{ data.title }}封面图"/>
+                    </div>
+                </div>
+                <div class="comment-container">
+                    <div class="music-kicker">Random Music</div>
+                    <h2 class="music-title" id="song-name">加载中...</h2>
+                    <div class="comment-text" id="comment-text">少女正在祈祷中...</div>
+                    <div class="music-visualizer" aria-hidden="true">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <div class="author-container">
+                        <div class="author-text">来自 @<span id="commnet-user">加载中...</span></div>
+                        <div class="author-text"><i class="iconfont icon-musiccloud"></i> 歌曲下方的评论</div>
+                        <div class="author-text">于 <strong><span id="commnet-date">加载中...</span></strong></div>
+                    </div>
+                </div>
+            </section>
+            <section class="music-player-panel">
+                <div class="music-player-heading">
+                    <span>Now Playing</span>
+                    <strong>{{ data.author }}</strong>
+                </div>
+                <div class="music">
+                    <div id="player3" class="aplayer">
+                        <pre class="aplayer-lrc-content">{% for lrc in data.format_lrc %}
+{{ lrc }}
+{% endfor %}</pre>
+                    </div>
+                </div>
+                <div id="musicCanvasFrame" class="music-canvas-frame" aria-hidden="true"></div>
+            </section>
+        </div>
+    </article>
+{% endblock %}
+
+{% block js %}
+    <script src="https://cdn.mongona.com/static/js/canvas.js?v=20260624canvasstop1"></script>
+    <script src="https://cdn.bootcss.com/fetch/2.0.3/fetch.min.js"></script>
+    <script src="https://cdn.mongona.com/static/js/rgbaster.min.js"></script>
+    <script src="https://cdn.mongona.com/static/APlayer.min.js?v=20260623aplayer1"></script>
+    <script>
+        var currentMusic = {
+            title: "{{ data.title|escapejs }}",
+            author: "{{ data.author|escapejs }}",
+            images: "{{ data.images|escapejs }}",
+            pic: "{{ data.images|escapejs }}",
+            mp3_url: "{{ data.mp3_url|escapejs }}",
+            url: "{{ data.mp3_url|escapejs }}",
+            comment_content: "{{ data.comment_content|escapejs }}",
+            comment_nickname: "{{ data.comment_nickname|escapejs }}",
+            comment_pub_date: "{{ data.comment_pub_date|escapejs }}",
+            format_lrc: [{% for lrc in data.format_lrc %}"{{ lrc|escapejs }}"{% if not forloop.last %}, {% endif %}{% endfor %}]
+        };
+        var pageMusicSyncId = 'life-' + Date.now() + '-' + Math.random().toString(36).slice(2);
+
+        function normalizePageMusic(data) {
+            data = data || {};
+            return {
+                title: data.title || 'Random Music',
+                author: data.author || 'Mongona Radio',
+                images: data.images || data.pic || '',
+                pic: data.images || data.pic || '',
+                mp3_url: data.mp3_url || data.url || '',
+                url: data.mp3_url || data.url || '',
+                comment_content: data.comment_content || '',
+                comment_nickname: data.comment_nickname || data.nickname || '',
+                comment_pub_date: data.comment_pub_date || '',
+                format_lrc: data.format_lrc || []
+            };
+        }
+
+        if (window.MongonaMusic && window.MongonaMusic.state && window.MongonaMusic.state().track && window.MongonaMusic.state().track.url) {
+            currentMusic = normalizePageMusic(window.MongonaMusic.state().track);
+        }
+
+        function getHotComment() {
+            var $musicPage = $('.music-page');
+            var $musicHero = $('.music-hero-card');
+            $musicHero.addClass('mask');
+            $musicHero.removeClass('shownow');
+            var album = new Image();
+            album.src = (currentMusic.images || '') + '?param=320y320';
+            album.alt = (currentMusic.title || 'Random Music') + '封面图';
+            album.onload = function () {
+                $('#album-img').attr('src', album.src);
+                $('#album-img').attr('alt', album.alt);
+                $('#comment-text').text(currentMusic.comment_content || '这首歌暂时没有精选评论。');
+                $('#commnet-user').text(currentMusic.comment_nickname || 'Mongona');
+                $('#song-name').text(currentMusic.title || 'Random Music');
+                $('#commnet-date').text(currentMusic.comment_pub_date || '刚刚');
+                {#$('.aplayer-lrc-content').text("{{ data.lrc }}");#}
+
+                $musicHero.addClass('shownow');
+                $musicHero.removeClass('mask');
+                RGBaster.colors(album, {
+                    success: function (payload) {
+                        var c = payload.dominant.match(/\d+/g);
+                        var color = 'rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')';
+                        var grayLevel = c[0] * 0.299 + c[1] * 0.587 + c[2] * 0.114;
+                        $musicPage.css('--music-accent', color);
+                        if (grayLevel >= 192) {
+                            $musicPage.addClass('music-accent-light');
+                        } else {
+                            $musicPage.removeClass('music-accent-light');
+                        }
+                    }
+                });
+            };
+        }
+
+        getHotComment();
+        $('#player3').html('<pre class="aplayer-lrc-content"></pre>');
+        $('#player3 .aplayer-lrc-content').text((currentMusic.format_lrc || []).join('\n'));
+        var ap3 = new APlayer({
+            element: document.getElementById('player3'),
+            narrow: false,
+            autoplay: false,
+            showlrc: true,
+            music: {
+                title: currentMusic.title,
+                author: currentMusic.author,
+                url: currentMusic.mp3_url,
+                pic: currentMusic.images
+            }
+        });
+        ap3.init();
+
+        // Codex keep the random music canvas inside its fixed stage.
+        (function () {
+            var frame = document.getElementById("musicCanvasFrame");
+            var observer = null;
+            var resizeTimer = null;
+
+            function canvasList() {
+                return Array.prototype.slice.call(document.querySelectorAll("canvas.canvas_container"));
+            }
+
+            function fitMusicCanvas(canvas) {
+                if (!frame || !canvas) {
+                    return;
+                }
+                canvas.style.position = "absolute";
+                canvas.style.inset = "0";
+                canvas.style.width = "100%";
+                canvas.style.height = "100%";
+                canvas.style.maxWidth = "none";
+                canvas.style.margin = "0";
+                canvas.style.display = "block";
+                canvas.style.pointerEvents = "none";
+            }
+
+            function normalizeMusicCanvas() {
+                if (!frame) {
+                    return false;
+                }
+                var canvases = canvasList();
+                if (!canvases.length) {
+                    return false;
+                }
+                var keeper = canvases[0];
+                for (var i = 1; i < canvases.length; i += 1) {
+                    if (canvases[i].parentNode) {
+                        canvases[i].parentNode.removeChild(canvases[i]);
+                    }
+                }
+                if (keeper.parentNode !== frame) {
+                    frame.appendChild(keeper);
+                }
+                keeper.className = "canvas_container";
+                fitMusicCanvas(keeper);
+                frame.classList.add("is-active");
+                return true;
+            }
+
+            function watchMusicCanvas() {
+                var attempts = 0;
+                clearInterval(resizeTimer);
+                resizeTimer = setInterval(function () {
+                    attempts += 1;
+                    if (normalizeMusicCanvas() && attempts > 8) {
+                        clearInterval(resizeTimer);
+                    }
+                    if (attempts > 40) {
+                        clearInterval(resizeTimer);
+                    }
+                }, 120);
+            }
+
+            function startMusicCanvas() {
+                if (!document.querySelector("canvas.canvas_container") && window.$$$ && typeof window.$$$.init === "function") {
+                    try {
+                        window.$$$.init();
+                    } catch (err) {
+                        if (window.console) {
+                            console.warn(err);
+                        }
+                    }
+                }
+                watchMusicCanvas();
+            }
+
+            function stopMusicPlayer() {
+                if (!ap3) {
+                    return;
+                }
+                try {
+                    if (ap3.audio) {
+                        ap3.audio.pause();
+                        ap3.audio.removeAttribute("src");
+                        ap3.audio.load();
+                    }
+                } catch (err) {
+                    if (window.console) {
+                        console.warn(err);
+                    }
+                }
+                try {
+                    if (typeof ap3.destroy === "function") {
+                        ap3.destroy();
+                    }
+                } catch (err) {
+                    if (window.console) {
+                        console.warn(err);
+                    }
+                }
+                ap3 = null;
+            }
+
+            function bindMusicPlayer() {
+                if (!ap3 || !ap3.audio) {
+                    return;
+                }
+                ap3.audio.addEventListener("play", function () {
+                    if (window.MongonaMusic && typeof window.MongonaMusic.adopt === "function") {
+                        window.MongonaMusic.adopt(ap3.audio, currentMusic, {
+                            player: ap3,
+                            sourceId: pageMusicSyncId
+                        });
+                    }
+                    startMusicCanvas();
+                });
+            }
+
+            function renderMusicTrack(data, options) {
+                var shouldResume;
+                options = options || {};
+                shouldResume = options.autoplay === true ||
+                    (ap3 && ap3.audio && !ap3.audio.paused) ||
+                    (window.MongonaMusic && typeof window.MongonaMusic.isPlaying === "function" && window.MongonaMusic.isPlaying());
+                stopMusicPlayer();
+                currentMusic = normalizePageMusic(data || currentMusic);
+                getHotComment();
+                $("#player3").html('<pre class="aplayer-lrc-content"></pre>');
+                $("#player3 .aplayer-lrc-content").text((currentMusic.format_lrc || []).join("\n"));
+                ap3 = new APlayer({
+                    element: document.getElementById("player3"),
+                    narrow: false,
+                    autoplay: false,
+                    showlrc: true,
+                    music: {
+                        title: currentMusic.title,
+                        author: currentMusic.author,
+                        url: currentMusic.mp3_url,
+                        pic: currentMusic.images
+                    }
+                });
+                ap3.init();
+                bindMusicPlayer();
+                if (window.MongonaMusic && typeof window.MongonaMusic.attachPlayer === "function") {
+                    window.MongonaMusic.attachPlayer(ap3, currentMusic, {
+                        autoplay: shouldResume,
+                        sourceId: pageMusicSyncId
+                    }).catch(function () {});
+                } else if (shouldResume && ap3.audio) {
+                    ap3.audio.play().catch(function () {});
+                }
+            }
+
+            function syncMusicPage(event) {
+                var detail = event.detail || {};
+                var track = normalizePageMusic(detail.track);
+                var sameTrack = track.mp3_url && track.mp3_url === currentMusic.mp3_url;
+                if (!track.mp3_url) {
+                    return;
+                }
+                if (sameTrack) {
+                    if (!ap3 || !ap3.audio || detail.sourceId === pageMusicSyncId) {
+                        return;
+                    }
+                    if (typeof detail.currentTime === "number" && Math.abs((ap3.audio.currentTime || 0) - detail.currentTime) > 1.2) {
+                        try {
+                            ap3.audio.currentTime = detail.currentTime;
+                        } catch (err) {}
+                    }
+                    if (detail.paused) {
+                        if (!ap3.audio.paused) {
+                            if (typeof ap3.pause === "function") {
+                                ap3.pause();
+                            } else {
+                                ap3.audio.pause();
+                            }
+                        }
+                        return;
+                    }
+                    if (window.MongonaMusic && typeof window.MongonaMusic.attachPlayer === "function") {
+                        window.MongonaMusic.attachPlayer(ap3, currentMusic, {
+                            autoplay: true,
+                            currentTime: detail.currentTime || 0,
+                            sourceId: pageMusicSyncId
+                        }).catch(function () {});
+                    } else {
+                        ap3.audio.play().catch(function () {});
+                    }
+                    return;
+                }
+                renderMusicTrack(track, {autoplay: !detail.paused});
+            }
+
+            if (window.MutationObserver && frame) {
+                observer = new MutationObserver(function () {
+                    normalizeMusicCanvas();
+                });
+                observer.observe(document.body, {childList: true, subtree: true});
+            }
+
+            $(window).on("resize.musicCanvas orientationchange.musicCanvas", function () {
+                var canvas = frame ? frame.querySelector("canvas.canvas_container") : null;
+                fitMusicCanvas(canvas);
+            });
+
+            normalizeMusicCanvas();
+            bindMusicPlayer();
+            if (window.MongonaMusic && typeof window.MongonaMusic.attachPlayer === "function") {
+                window.MongonaMusic.attachPlayer(ap3, currentMusic, {
+                    autoplay: typeof window.MongonaMusic.isPlaying === "function" && window.MongonaMusic.isPlaying(),
+                    sourceId: pageMusicSyncId
+                }).catch(function () {});
+            }
+            document.addEventListener("mongona:music-sync", syncMusicPage);
+            window.MongonaPagePlayTrack = function (track, options) {
+                renderMusicTrack(track, {autoplay: !options || options.autoplay !== false});
+                return true;
+            };
+            window.MongonaPageCleanup = function () {
+                clearInterval(resizeTimer);
+                $(window).off(".musicCanvas");
+                if (observer) {
+                    observer.disconnect();
+                }
+                if (window.$$$ && typeof window.$$$.__del === "function") {
+                    window.$$$.__del();
+                }
+                document.removeEventListener("mongona:music-sync", syncMusicPage);
+                window.MongonaPagePlayTrack = null;
+                stopMusicPlayer();
+            };
+            watchMusicCanvas();
+        }());
+    </script>
+{% endblock %}

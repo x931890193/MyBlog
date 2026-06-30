@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+{% block site_title %}Sponsor | {{ siteinfo.site_name }}{% endblock %}
+{% block meta_keywords %}开发者广告,技术博客赞助,AI工具投放,云服务推广,技术内容合作{% endblock %}
+{% block meta_description %}{{ seo_description|default:"Mongona 赞助与合作入口，适合云服务、AI 工具、开发者产品、课程、招聘和技术内容合作投放。" }}{% endblock %}
+{% block article %}
+<div class="growth-page sponsor-page">
+    <section class="growth-hero sponsor-hero">
+        <div class="growth-kicker">Commercial</div>
+        <h2>赞助与合作</h2>
+        <p>Mongona 正在升级成开发者技术情报站和工具站。适合云服务、开发工具、AI 产品、课程、开源项目、招聘团队投放长期曝光。</p>
+        <div class="growth-hero-actions">
+            <a href="#lead-form">提交需求</a>
+            <a href="#service-products">查看服务</a>
+            <a href="mailto:{{ contact_email }}?subject=Mongona%20合作咨询">邮件联系</a>
+        </div>
+    </section>
+
+    {% with page_ads=sponsor_ads.sponsor %}
+        {% if page_ads %}
+            {% for ad in page_ads %}
+                <section class="money-strip sponsor-ad-item" data-sponsor-ad-id="{{ ad.id }}">
+                    <button type="button" class="sponsor-ad-close" aria-label="关闭广告" title="关闭广告">&times;</button>
+                    <div>
+                        <div class="growth-kicker">Sponsored</div>
+                        <h3>{{ ad.title }}</h3>
+                        <p>{{ ad.description }}</p>
+                    </div>
+                    <div class="money-strip-actions">
+                        <a class="money-button" href="/go/{{ ad.id }}/" target="_blank"
+                           rel="nofollow sponsored noopener">{{ ad.cta_text }}</a>
+                    </div>
+                </section>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <section class="money-strip">
+        <div>
+            <div class="growth-kicker">Revenue Path</div>
+            <h3>先从小额服务和赞助位开始变现</h3>
+            <p>把现有技术内容、自动采集、工具箱和个人经验包装成可购买的服务，先验证真实需求，再继续做会员、课程或 SaaS。</p>
+        </div>
+        <div class="money-strip-actions">
+            <a class="money-button" href="#lead-form">我要咨询</a>
+            <a class="money-button-secondary" href="#sponsor-process">合作流程</a>
+        </div>
+    </section>
+
+    <section id="lead-form" class="sponsor-lead-card">
+        <div class="sponsor-lead-copy">
+            <div class="growth-kicker">Lead Desk</div>
+            <h3>提交合作需求</h3>
+            <p>写清楚产品、目标、预算和希望上线的位置，我会按需求类型评估能否快速落地。适合赞助、工具定制、技术咨询、内容合作和自动化采集。</p>
+        </div>
+        <form id="sponsorLeadForm" class="sponsor-lead-form" method="post" action="/api/sponsor-lead/">
+            {% csrf_token %}
+            <input type="hidden" name="source_path" value="/sponsor/">
+            <input class="lead-hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+            <label>
+                <span>称呼</span>
+                <input type="text" name="name" maxlength="80" placeholder="你的名字或昵称" required>
+            </label>
+            <label>
+                <span>公司/产品</span>
+                <input type="text" name="company" maxlength="120" placeholder="可选">
+            </label>
+            <label>
+                <span>联系方式</span>
+                <input type="text" name="contact" maxlength="160" placeholder="邮箱 / 微信 / 手机" required>
+            </label>
+            <label>
+                <span>需求类型</span>
+                <select name="demand_type">
+                    <option value="sponsor">赞助投放</option>
+                    <option value="custom_tool">工具定制</option>
+                    <option value="consult">技术咨询</option>
+                    <option value="content">内容合作</option>
+                    <option value="automation">采集与自动化</option>
+                    <option value="other">其他需求</option>
+                </select>
+            </label>
+            <label>
+                <span>预算</span>
+                <select name="budget">
+                    <option value="unknown">暂未确定</option>
+                    <option value="lt_1k">1000 元以内</option>
+                    <option value="1k_5k">1000-5000 元</option>
+                    <option value="5k_20k">5000-20000 元</option>
+                    <option value="gt_20k">20000 元以上</option>
+                </select>
+            </label>
+            <label class="sponsor-lead-wide">
+                <span>需求描述</span>
+                <textarea name="message" maxlength="2000" rows="5" placeholder="产品介绍、目标页面、周期、希望交付的内容或工具能力"></textarea>
+            </label>
+            <div class="sponsor-lead-submit">
+                <button type="submit" class="money-button">提交需求</button>
+                <span id="sponsorLeadStatus" role="status"></span>
+            </div>
+        </form>
+    </section>
+
+    <section id="service-products" class="service-grid">
+        {% for service in services %}
+            <article class="service-card">
+                <span>{{ service.label }}</span>
+                <h3>{{ service.name }}</h3>
+                <strong>{{ service.price }}</strong>
+                <p>{{ service.desc }}</p>
+            </article>
+        {% endfor %}
+    </section>
+
+    <section id="sponsor-plans" class="sponsor-plans">
+        {% for plan in plans %}
+            <article class="sponsor-plan">
+                <span>{{ plan.label }}</span>
+                <h3>{{ plan.name }}</h3>
+                <strong>{{ plan.price }}</strong>
+                <p>{{ plan.desc }}</p>
+                <ul>
+                    {% for item in plan.items %}
+                        <li>{{ item }}</li>
+                    {% endfor %}
+                </ul>
+            </article>
+        {% endfor %}
+    </section>
+
+    <section class="sponsor-slots">
+        <h3>可售广告位</h3>
+        <div class="slot-grid">
+            <div><strong>技术雷达</strong><span>每日技术资讯顶部/中段赞助位</span></div>
+            <div><strong>工具箱</strong><span>工具卡片推荐位、结果页 CTA</span></div>
+            <div><strong>文章正文</strong><span>文章底部推荐、友情链接</span></div>
+            <div><strong>定制内容</strong><span>产品评测、教程、部署实战</span></div>
+        </div>
+    </section>
+
+    <section class="sponsor-proof">
+        {% for point in proof_points %}
+            <div><strong>{{ point.name }}</strong><span>{{ point.desc }}</span></div>
+        {% endfor %}
+    </section>
+
+    <section id="sponsor-process" class="growth-note sponsor-process">
+        <strong>合作流程：</strong>确认产品与投放目标，确定位置和周期，提供素材与链接，上线后给出曝光位置与页面链接。首批赞助可按月试投，后续根据流量和转化逐步提价。
+    </section>
+
+    <section class="sponsor-contact">
+        <div>
+            <div class="growth-kicker">Contact</div>
+            <h3>把需求发过来，先做一个小闭环</h3>
+            <p>建议直接写清楚产品/需求、预算、希望上线的位置和周期。能小单成交的事情先做，不一开始做大而空的方案。</p>
+        </div>
+        <div class="sponsor-contact-actions">
+            <a class="money-button" href="#lead-form">提交需求</a>
+            <a class="money-button-secondary" href="mailto:{{ contact_email }}?subject=Mongona%20合作咨询">发送邮件</a>
+            <a class="money-button-secondary" href="/?c=6">了解站长</a>
+        </div>
+    </section>
+</div>
+{% endblock %}
+{% block js %}
+{{ block.super }}
+<script>
+(function () {
+    var form = $('#sponsorLeadForm');
+    var status = $('#sponsorLeadStatus');
+    if (!form.length || form.data('bound')) {
+        return;
+    }
+    form.data('bound', true);
+    form.find('[name="source_path"]').val(window.location.pathname + window.location.search);
+
+    form.on('submit', function (event) {
+        var button = form.find('button[type="submit"]');
+        var originalText = button.text();
+        event.preventDefault();
+        status.removeClass('is-error is-success').text('正在提交...');
+        button.prop('disabled', true).text('提交中');
+        $.ajax({
+            url: form.attr('action'),
+            method: 'POST',
+            data: form.serialize(),
+            headers: {'X-CSRFToken': form.find('[name="csrfmiddlewaretoken"]').val()},
+            success: function (res) {
+                status.addClass('is-success').text((res && res.msg) || '需求已收到，我会尽快联系你。');
+                form[0].reset();
+                form.find('[name="source_path"]').val(window.location.pathname + window.location.search);
+            },
+            error: function (xhr) {
+                var res = xhr.responseJSON || {};
+                status.addClass('is-error').text(res.msg || '提交失败，请稍后再试。');
+            },
+            complete: function () {
+                button.prop('disabled', false).text(originalText);
+            }
+        });
+    });
+}());
+</script>
+{% endblock %}
