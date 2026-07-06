@@ -57,17 +57,5 @@
 </article>
 {% endblock %}
 {% block js %}
-<script src="{%  static 'amazeui/assets/js/jquery.min.js' %}" type="text/javascript"></script>
-<script>
-$.get("https://www.tianqiapi.com/api/?version=v6&appid=16914744&appsecret=BqXIPng1", null, function(t) {
-    if (t){
-        console.log(t);
-        "" === t ? $(".weather-city").text("暂无数据") : ($(".weather-t1").text(t.tem), $(".weather-t2").text(t.humidity), $(".weather-city").text(t.city +"/"+ t.wea+"/"+t.win));
-    }else {
-        (".weather-city").text("暂无数据");
-    }
-    }, "JSON");
-</script>
 {% endblock %}
-
 

@@ -1,11 +1,14 @@
 # coding=utf-8
+import ipaddress
 import json
+import math
 import random
 import traceback
 from collections import Counter
 from datetime import datetime, timedelta
 
 import pymongo
+import requests
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import F, Q
 from django.http import HttpResponse, JsonResponse
@@ -23,6 +26,48 @@ from .notifications import notify_sponsor_lead_async
 from .seo import TOOL_PAGES, STATIC_SITEMAP_PAGES, absolute_url, meta_description, tool_by_slug
 from .site_assistant import build_site_assistant_response
 from spider.utils import mongodb
+
+
+OPEN_METEO_FORECAST_URL = 'https://api.open-meteo.com/v1/forecast'
+IP_LOCATION_URL = 'https://ipwho.is/%s'
+DEFAULT_WEATHER_LOCATION = {
+    'latitude': 39.9042,
+    'longitude': 116.4074,
+    'city': '北京',
+    'source': 'default',
+}
+WEATHER_CACHE_SECONDS = 10 * 60
+
+WEATHER_CODE_TEXT = {
+    0: '晴',
+    1: '少云',
+    2: '多云',
+    3: '阴',
+    45: '雾',
+    48: '雾凇',
+    51: '小毛毛雨',
+    53: '毛毛雨',
+    55: '大毛毛雨',
+    56: '冻毛毛雨',
+    57: '强冻毛毛雨',
+    61: '小雨',
+    63: '中雨',
+    65: '大雨',
+    66: '冻雨',
+    67: '强冻雨',
+    71: '小雪',
+    73: '中雪',
+    75: '大雪',
+    77: '雪粒',
+    80: '阵雨',
+    81: '强阵雨',
+    82: '暴雨',
+    85: '阵雪',
+    86: '强阵雪',
+    95: '雷暴',
+    96: '雷暴冰雹',
+    99: '强雷暴冰雹',
+}
 
 
 def clean_text(value, max_length):
@@ -45,6 +90,194 @@ def positive_int(value, default=1):
     except (TypeError, ValueError):
         return default
     return value if value > 0 else default
+
+
+def parse_coordinate(value, minimum, maximum):
+    try:
+        value = float(value)
+    except (TypeError, ValueError):
+        return None
+    if math.isnan(value) or value < minimum or value > maximum:
+        return None
+    return value
+
+
+def is_public_ip(ip):
+    try:
+        parsed = ipaddress.ip_address(ip)
+    except Exception:
+        return False
+    return not (
+        parsed.is_private or parsed.is_loopback or parsed.is_reserved
+        or parsed.is_link_local or parsed.is_multicast or parsed.is_unspecified
+    )
+
+
+def cached_json(cache_key):
+    try:
+        cached = redis_client.get(cache_key)
+        if cached:
+            if isinstance(cached, bytes):
+                cached = cached.decode('utf-8')
+            return json.loads(cached)
+    except Exception as e:
+        logger.warning('Weather cache read failed: %s', e)
+    return None
+
+
+def set_cached_json(cache_key, data, seconds=WEATHER_CACHE_SECONDS):
+    try:
+        redis_client.setex(cache_key, seconds, json.dumps(data, ensure_ascii=False))
+    except Exception as e:
+        logger.warning('Weather cache write failed: %s', e)
+
+
+def ip_weather_location(request):
+    ip = client_ip(request)
+    if not ip or not is_public_ip(ip):
+        return None
+    cache_key = 'weather:ip-location:%s' % ip
+    cached = cached_json(cache_key)
+    if cached:
+        return cached
+    try:
+        resp = requests.get(IP_LOCATION_URL % ip, params={'lang': 'zh-CN'}, timeout=3)
+        if resp.status_code != 200:
+            return None
+        data = resp.json()
+    except Exception as e:
+        logger.warning('IP location failed: %s', e)
+        return None
+    if not data or data.get('success') is False:
+        return None
+    latitude = parse_coordinate(data.get('latitude'), -90, 90)
+    longitude = parse_coordinate(data.get('longitude'), -180, 180)
+    if latitude is None or longitude is None:
+        return None
+    location = {
+        'latitude': latitude,
+        'longitude': longitude,
+        'city': clean_text(data.get('city') or data.get('region') or data.get('country'), 40) or '当地',
+        'source': 'ip',
+    }
+    set_cached_json(cache_key, location, 24 * 3600)
+    return location
+
+
+def request_weather_location(request):
+    latitude = parse_coordinate(request.GET.get('lat'), -90, 90)
+    longitude = parse_coordinate(request.GET.get('lon'), -180, 180)
+    if latitude is not None and longitude is not None:
+        return {
+            'latitude': latitude,
+            'longitude': longitude,
+            'city': clean_text(request.GET.get('city'), 40) or '当前位置',
+            'source': 'browser',
+        }
+    return ip_weather_location(request) or DEFAULT_WEATHER_LOCATION.copy()
+
+
+def weather_api(request):
+    location = request_weather_location(request)
+    rounded_lat = round(location['latitude'], 2)
+    rounded_lon = round(location['longitude'], 2)
+    cache_key = 'weather:open-meteo:v1:%s:%s' % (rounded_lat, rounded_lon)
+    cached = cached_json(cache_key)
+    if cached:
+        cached['data']['city'] = location.get('city') or cached['data'].get('city') or '当地'
+        cached['data']['source'] = location.get('source') or cached['data'].get('source') or 'cache'
+        return JsonResponse(cached)
+
+    params = {
+        'latitude': location['latitude'],
+        'longitude': location['longitude'],
+        'current': 'temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m',
+        'daily': 'temperature_2m_max,temperature_2m_min,weather_code',
+        'timezone': 'auto',
+        'forecast_days': 3,
+    }
+    try:
+        resp = requests.get(OPEN_METEO_FORECAST_URL, params=params, timeout=4)
+        resp.raise_for_status()
+        raw = resp.json()
+        current = raw.get('current') or {}
+        daily = raw.get('daily') or {}
+    except Exception as e:
+        logger.warning('Open-Meteo weather failed: %s', e)
+        if location.get('source') != 'default':
+            location = DEFAULT_WEATHER_LOCATION.copy()
+            return weather_api_with_location(location)
+        return JsonResponse({'code': 1, 'msg': 'weather unavailable', 'data': {}})
+
+    code = current.get('weather_code')
+    data = {
+        'city': location.get('city') or '当地',
+        'source': location.get('source') or 'unknown',
+        'temperature': current.get('temperature_2m'),
+        'humidity': current.get('relative_humidity_2m'),
+        'weather_code': code,
+        'weather': WEATHER_CODE_TEXT.get(code, '天气'),
+        'wind_speed': current.get('wind_speed_10m'),
+        'time': current.get('time'),
+        'daily': {
+            'time': daily.get('time') or [],
+            'weather_code': daily.get('weather_code') or [],
+            'temperature_max': daily.get('temperature_2m_max') or [],
+            'temperature_min': daily.get('temperature_2m_min') or [],
+        },
+    }
+    payload = {'code': 0, 'msg': None, 'data': data}
+    set_cached_json(cache_key, payload)
+    return JsonResponse(payload)
+
+
+def weather_api_with_location(location):
+    rounded_lat = round(location['latitude'], 2)
+    rounded_lon = round(location['longitude'], 2)
+    cache_key = 'weather:open-meteo:v1:%s:%s' % (rounded_lat, rounded_lon)
+    cached = cached_json(cache_key)
+    if cached:
+        return JsonResponse(cached)
+    params = {
+        'latitude': location['latitude'],
+        'longitude': location['longitude'],
+        'current': 'temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m',
+        'daily': 'temperature_2m_max,temperature_2m_min,weather_code',
+        'timezone': 'auto',
+        'forecast_days': 3,
+    }
+    try:
+        resp = requests.get(OPEN_METEO_FORECAST_URL, params=params, timeout=4)
+        resp.raise_for_status()
+        raw = resp.json()
+        current = raw.get('current') or {}
+        daily = raw.get('daily') or {}
+        code = current.get('weather_code')
+        payload = {
+            'code': 0,
+            'msg': None,
+            'data': {
+                'city': location.get('city') or '北京',
+                'source': location.get('source') or 'default',
+                'temperature': current.get('temperature_2m'),
+                'humidity': current.get('relative_humidity_2m'),
+                'weather_code': code,
+                'weather': WEATHER_CODE_TEXT.get(code, '天气'),
+                'wind_speed': current.get('wind_speed_10m'),
+                'time': current.get('time'),
+                'daily': {
+                    'time': daily.get('time') or [],
+                    'weather_code': daily.get('weather_code') or [],
+                    'temperature_max': daily.get('temperature_2m_max') or [],
+                    'temperature_min': daily.get('temperature_2m_min') or [],
+                },
+            },
+        }
+        set_cached_json(cache_key, payload)
+        return JsonResponse(payload)
+    except Exception as e:
+        logger.warning('Default weather failed: %s', e)
+        return JsonResponse({'code': 1, 'msg': 'weather unavailable', 'data': {}})
 
 
 def article_queryset():

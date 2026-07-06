@@ -3,7 +3,7 @@ from django.views.static import serve
 from django.conf import settings
 from django.conf.urls.static import static
 from MyBlog.settings import MEDIA_URL
-from blog.views import blog, bloglist, robots, sitemap, article_like, duanzi_like, tech_radar, dev_tools, sponsor, random_music_api, site_assistant_api, sponsor_lead_api, sponsor_ad_redirect, sponsor_ad_event_api, tag_landing
+from blog.views import blog, bloglist, robots, sitemap, article_like, duanzi_like, tech_radar, dev_tools, sponsor, random_music_api, site_assistant_api, sponsor_lead_api, sponsor_ad_redirect, sponsor_ad_event_api, tag_landing, weather_api
 
 urlpatterns = [
     url(r'^$', bloglist, name=''),
@@ -15,6 +15,7 @@ urlpatterns = [
     url(r'^go/(?P<ad_id>\d+)/?$', sponsor_ad_redirect, name='sponsor_ad_redirect'),
     url(r'^api/random-music/?$', random_music_api, name='random_music_api'),
     url(r'^api/site-assistant/?$', site_assistant_api, name='site_assistant_api'),
+    url(r'^api/weather/?$', weather_api, name='weather_api'),
     url(r'^api/sponsor-lead/?$', sponsor_lead_api, name='sponsor_lead_api'),
     url(r'^api/sponsor-ad-event/?$', sponsor_ad_event_api, name='sponsor_ad_event_api'),
     url(r'^blog/(?P<id>\w+)$', blog, name='blog'),  # 文章id

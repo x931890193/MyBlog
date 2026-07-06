@@ -241,7 +241,7 @@ h1, h2 {
     </div>
 </header>
 
-<a href="https://www.tianqiapi.com"  target="_blank">
+<a href="https://open-meteo.com/" target="_blank" rel="noopener">
     <div class="header-weather">
         <span class="weather-t1">--</span>
         <span class="weather-t2">--</span>
@@ -281,14 +281,65 @@ h1, h2 {
     $('body').removeClass('loading');
   }, 1000);
 });
-    $.get("https://www.tianqiapi.com/api/?version=v6&appid=16914744&appsecret=BqXIPng1", null, function (t) {
-        if (t) {
-            console.log(t);
-            "" === t ? $(".weather-city").text("暂无数据") : ($(".weather-t1").text(t.tem), $(".weather-t2").text(t.humidity), $(".weather-city").text(t.city + "/" + t.wea + "/" + t.win));
-        } else {
-            (".weather-city").text("暂无数据");
+    (function () {
+        var $temperature = $(".weather-t1");
+        var $humidity = $(".weather-t2");
+        var $city = $(".weather-city");
+
+        function updateStatus(text) {
+            $temperature.text("--");
+            $humidity.text("--");
+            $city.text(text || "正在获取天气");
         }
-    }, "JSON");
+
+        function formatNumber(value) {
+            var number = Number(value);
+            if (!isFinite(number)) {
+                return "--";
+            }
+            return Math.round(number);
+        }
+
+        function renderWeather(resp) {
+            var data = resp && resp.data ? resp.data : null;
+            if (!data || resp.code !== 0) {
+                updateStatus("暂无数据");
+                return;
+            }
+            var wind = data.wind_speed === null || data.wind_speed === undefined ? "" : "风" + formatNumber(data.wind_speed) + "km/h";
+            $temperature.text(formatNumber(data.temperature));
+            $humidity.text(data.humidity === null || data.humidity === undefined ? "--" : formatNumber(data.humidity) + "%");
+            $city.text([data.city || "当地", data.weather || "天气", wind].filter(Boolean).join("/"));
+        }
+
+        function fetchWeather(params) {
+            $.getJSON("/api/weather/", params || {}).done(renderWeather).fail(function () {
+                updateStatus("暂无数据");
+            });
+        }
+
+        function useIpFallback() {
+            updateStatus("正在按IP定位");
+            fetchWeather({});
+        }
+
+        if (navigator.geolocation) {
+            updateStatus("请求定位中");
+            navigator.geolocation.getCurrentPosition(function (position) {
+                fetchWeather({
+                    lat: position.coords.latitude,
+                    lon: position.coords.longitude,
+                    city: "当前位置"
+                });
+            }, useIpFallback, {
+                enableHighAccuracy: false,
+                timeout: 5000,
+                maximumAge: 10 * 60 * 1000
+            });
+        } else {
+            useIpFallback();
+        }
+    })();
 </script>
 </body>
 </html>
