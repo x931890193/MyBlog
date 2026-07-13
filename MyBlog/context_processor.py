@@ -1,6 +1,7 @@
 # coding=utf-8
 import pickle
 import random
+from collections import Counter
 
 from django.db.models import Sum, Q
 from django.utils import timezone
@@ -15,6 +16,7 @@ from spider.utils import get_mongo
 DEFAULT_BANNER_URL = 'https://cdn.mongona.com/banner_image/17f6bba8267f8cf8899d5ce75f820918.jpg'
 SITE_INFO_CACHE_KEY = 'myblog:site_info:v2'
 BANNER_CACHE_KEY = 'myblog:banner:v1'
+DEFAULT_TAG_CLOUD_LIMIT = 48
 
 
 def env_int(name, default):
@@ -81,6 +83,18 @@ def grouped_sponsor_ads():
     return grouped
 
 
+def popular_site_tags():
+    limit = env_int('TAG_CLOUD_LIMIT', DEFAULT_TAG_CLOUD_LIMIT)
+    if limit <= 0:
+        return []
+    counter = Counter()
+    tag_values = Article.objects.filter(article_type='2').exclude(article_tag='') \
+        .values_list('article_tag', flat=True).order_by('-article_create_time')[:2000]
+    for value in tag_values:
+        counter.update(tag for tag in (value or '').split() if tag)
+    return [tag for tag, count in counter.most_common(limit)]
+
+
 def build_site_info():
     userinfo = UserProfile.objects.get(id=1)  # 站长资料
     siteinfo = Siteinfo.objects.get(pk=1)  # 获取站点信息
@@ -89,9 +103,7 @@ def build_site_info():
     hot_articles = list(base_query.order_by('-article_click')[:10])  # 获取热门文章
     ac_count = base_query.count()  # 获得文章数量
     dates = list(Article.objects.datetimes('article_create_time', 'month', order='DESC', tzinfo='Asia/Shanghai'))
-    tag_values = Article.objects.filter(article_type='2').values_list("article_tag", flat=True).distinct()
-    tag_text = ' '.join(tag_values)
-    tags = list(set(tag for tag in tag_text.split(' ') if tag))
+    tags = popular_site_tags()
     ac_click = base_query.aggregate(total=Sum('article_click')).get('total') or 0
     tagcss = ['am-radius', 'am-square', 'am-badge-primary', 'am-badge-secondary',
               'am-badge-success', 'am-badge-warning', 'am-badge-danger']
@@ -124,9 +136,7 @@ def load_cached_site_info(force=None):
 
 def site_info(request, force=None):
     data = load_cached_site_info(force=force).copy()
-    tags = list(data.get('alltags') or [])
-    random.shuffle(tags)
-    data['alltags'] = tags
+    data['alltags'] = list(data.get('alltags') or [])
     data['banner'] = get_random_banner_url()
     data.update(frontend_env())
     return data
